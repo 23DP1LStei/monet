@@ -1,14 +1,7 @@
-﻿import { Link } from "react-router";
+import { Link } from "react-router";
 import { Building2 } from "lucide-react";
 
 const LINKS = {
-  Explore: [
-    { label: "All Spaces",       href: "/search" },
-    { label: "Riga Hubs",        href: "/search?location=Riga" },
-    { label: "Tallinn Hubs",     href: "/search?location=Tallinn" },
-    { label: "Vilnius Tech Park",href: "/search?location=Vilnius" },
-    { label: "Meeting Rooms",    href: "/search?type=meeting-room" },
-  ],
   Workspace: [
     { label: "Hot Desks",       href: "/search?type=hot-desk" },
     { label: "Dedicated Desks", href: "/search?type=dedicated" },
@@ -37,10 +30,10 @@ export function Footer() {
               <span className="font-display text-[17px] font-bold tracking-tight text-zinc-950 leading-none">Monet</span>
             </Link>
             <p className="mt-4 text-[13px] text-zinc-500 leading-relaxed max-w-xs">
-              The on-demand coworking booking network â€” beautiful spaces across Riga, Tallinn, Vilnius and beyond.
+              The on-demand coworking booking network — beautiful spaces across Riga, Tallinn, Vilnius and beyond.
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1">
-              {["ðŸ‡±ðŸ‡» Latvia", "ðŸ‡ªðŸ‡ª Estonia", "ðŸ‡±ðŸ‡¹ Lithuania", "ðŸ‡©ðŸ‡ª Germany"].map(c => (
+              {["🇱🇻 Latvia", "🇪🇪 Estonia", "🇱🇹 Lithuania", "🇩🇪 Germany"].map(c => (
                 <span key={c} className="text-[11px] text-zinc-400 font-medium leading-none">{c}</span>
               ))}
             </div>
@@ -61,7 +54,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-zinc-400">
-          <span className="leading-none">Â© 2026 Monet Hub. All rights reserved.</span>
+          <span className="leading-none">© 2026 Monet Hub. All rights reserved.</span>
           <div className="flex items-center gap-6">
             {["Privacy", "Terms", "Security"].map(l => (
               <span key={l} className="leading-none hover:text-zinc-600 transition-colors cursor-pointer">{l}</span>

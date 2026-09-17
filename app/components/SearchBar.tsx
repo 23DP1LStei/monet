@@ -1,21 +1,21 @@
-﻿import { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Calendar, Search } from "lucide-react";
 
 const LOCATIONS = [
-  { city: "Riga",    area: "Old Town & Central",     count: 34, emoji: "ðŸ›ï¸" },
-  { city: "Riga",    area: "Andrejsala",              count: 28, emoji: "ðŸŒŠ" },
-  { city: "Riga",    area: "Skanste Tech District",   count: 19, emoji: "ðŸ”¬" },
-  { city: "Tallinn", area: "Telliskivi Creative City",count: 42, emoji: "ðŸŽ¨" },
-  { city: "Vilnius", area: "Tech Park",               count: 31, emoji: "ðŸŒ¿" },
-  { city: "Berlin",  area: "Mitte & Kreuzberg",       count: 86, emoji: "ðŸ»" },
+  { city: "Riga",    area: "Old Town & Central",     count: 34, emoji: "🏛️" },
+  { city: "Riga",    area: "Andrejsala",              count: 28, emoji: "🌊" },
+  { city: "Riga",    area: "Skanste Tech District",   count: 19, emoji: "🔬" },
+  { city: "Tallinn", area: "Telliskivi Creative City",count: 42, emoji: "🎨" },
+  { city: "Vilnius", area: "Tech Park",               count: 31, emoji: "🌿" },
+  { city: "Berlin",  area: "Mitte & Kreuzberg",       count: 86, emoji: "🐻" },
 ];
 
 const SPACE_TYPES = [
   { id: "hot-desk",       label: "Hot Desk",       desc: "Flexible open seat" },
   { id: "dedicated",      label: "Dedicated Desk", desc: "Your permanent spot" },
-  { id: "private-office", label: "Private Office", desc: "Enclosed office for 1â€“12" },
+  { id: "private-office", label: "Private Office", desc: "Enclosed office for 1–12" },
   { id: "meeting-room",   label: "Meeting Room",   desc: "Equipped pods for calls" },
 ];
 
@@ -56,7 +56,7 @@ export function SearchBar() {
           className="flex flex-col justify-center text-left px-6 py-3.5 rounded-full min-w-[180px] hover:bg-zinc-50/80 transition-colors">
           <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 leading-none mb-1">Where</span>
           <span className={`text-[13.5px] font-medium leading-none truncate ${location ? "text-zinc-900" : "text-zinc-400"}`}>
-            {location ? `${location.city} Â· ${location.area.split("&")[0].trim()}` : "Search destinations"}
+            {location ? `${location.city} · ${location.area.split("&")[0].trim()}` : "Search destinations"}
           </span>
         </button>
 

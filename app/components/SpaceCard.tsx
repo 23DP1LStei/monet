@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import { Heart, Star, ChevronLeft, ChevronRight, Zap } from "lucide-react";
 import type { CoworkingSpace } from "../data/coworkings";
@@ -82,7 +82,7 @@ export function SpaceCard({ space, priceMode = "day", index = 0 }: Props) {
           </div>
         </div>
         <div className="mt-2">
-          <span className="text-[13.5px] font-bold text-zinc-900 tabular-nums">â‚¬{price}</span>
+          <span className="text-[13.5px] font-bold text-zinc-900 tabular-nums">€{price}</span>
           <span className="text-[12px] text-zinc-500"> / {labels[priceMode]}</span>
         </div>
       </div>

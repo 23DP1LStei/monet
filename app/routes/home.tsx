@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { Wifi, Key, Coffee, Shield, ArrowRight, CheckCircle, Building2 } from "lucide-react";
@@ -11,7 +11,7 @@ import { COWORKING_SPACES } from "../data/coworkings";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Monet â€” Book Beautiful Coworking Spaces" },
+    { title: "Monet — Book Beautiful Coworking Spaces" },
     { name: "description", content: "Find and book curated coworking spaces, dedicated desks, and meeting rooms across Riga, Tallinn, Vilnius and top European cities." },
   ];
 }
@@ -64,7 +64,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
             className="text-[16px] text-zinc-500 max-w-xl mx-auto leading-relaxed mb-10">
-            Book premium coworking desks, private studios, and meeting rooms â€” no memberships, instant access.
+            Book premium coworking desks, private studios, and meeting rooms — no memberships, instant access.
           </motion.p>
 
           <motion.div
@@ -77,7 +77,7 @@ export default function Home() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.44 }}
             className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12.5px] text-zinc-500">
-            {["âœ“ Free cancellation on day passes", "âœ“ Verified 1 Gbps fiber", "âœ“ No sign-up required"].map(t => (
+            {["✓ Free cancellation on day passes", "✓ Verified 1 Gbps fiber", "✓ No sign-up required"].map(t => (
               <span key={t} className="font-medium">{t}</span>
             ))}
           </motion.div>
@@ -166,7 +166,7 @@ export default function Home() {
                 <Key className="h-5 w-5 text-amber-700" strokeWidth={1.75} />
               </div>
               <h3 className="font-display text-[17px] font-bold text-zinc-950 mb-2">Instant digital key</h3>
-              <p className="text-[13px] text-zinc-600 leading-relaxed">Book, get your code, walk in â€” 60 seconds flat.</p>
+              <p className="text-[13px] text-zinc-600 leading-relaxed">Book, get your code, walk in — 60 seconds flat.</p>
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}

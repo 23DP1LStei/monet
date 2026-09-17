@@ -2,6 +2,16 @@
 .env
 /node_modules/
 
-# React Router
+# React Router & Build
 /.react-router/
 /build/
+
+# AI / IDE assistant files
+.agents/
+.gemini/
+.cursor/
+.windsurf/
+CLAUDE.md
+GEMINI.md
+AGENTS.md
+scripts/
