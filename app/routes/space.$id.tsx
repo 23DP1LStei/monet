@@ -14,7 +14,7 @@ import { COWORKING_SPACES } from "../data/coworkings";
 export function meta({ params }: Route.MetaArgs) {
   const space = COWORKING_SPACES.find(s => s.id === params.id);
   return [
-    { title: space ? `${space.name} — Monet` : "Space — Monet" },
+    { title: space ? `${space.name} ΓÇö Monet` : "Space ΓÇö Monet" },
     { name: "description", content: space?.description ?? "Book a premium coworking space on Monet." },
   ];
 }
@@ -54,9 +54,8 @@ function GalleryModal({ images, startIndex, onClose }: { images: string[]; start
   );
 }
 
-function BookingWidget({ priceHour, priceDay, priceMonth, isInstantBook, spaceId }: {
-  priceHour: number; priceDay: number; priceMonth: number; isInstantBook: boolean; spaceId: string;
-}) {
+function BookingWidget({ priceHour, priceDay, priceMonth, isInstantBook, name, spaceId }: {
+  priceHour: number; priceDay: number; priceMonth: number; isInstantBook: boolean; name: string; spaceId: string;) {
   const navigate = useNavigate();
   const [priceMode, setPriceMode] = useState<PriceMode>("day");
   const [date, setDate] = useState("");
@@ -158,7 +157,7 @@ export default function SpaceDetail() {
             <h1 className="font-display text-[26px] sm:text-[32px] font-extrabold tracking-tight text-zinc-950 leading-tight">{space.name}</h1>
             <div className="flex flex-wrap items-center gap-3 mt-2 text-[13px] text-zinc-500">
               <span className="flex items-center gap-1"><Star className="h-3.5 w-3.5 text-zinc-900" fill="currentColor" /><span className="font-bold text-zinc-900 tabular-nums">{space.rating}</span><span className="text-zinc-400">({space.reviewCount} reviews)</span></span>
-              <span>·</span>
+              <span>┬╖</span>
               <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" strokeWidth={1.75} />{space.address}</span>
             </div>
           </div>
@@ -218,14 +217,79 @@ export default function SpaceDetail() {
                 ))}
               </div>
             </div>
-            <p className="text-zinc-400 text-sm italic">Reviews coming next...</p>
+            
+            <div className="mb-10 pb-10 border-b border-zinc-200/60">
+              <h2 className="font-display text-[18px] font-extrabold text-zinc-950 mb-5">House rules</h2>
+              <ul className="space-y-3">
+                {space.rules.map(r => (
+                  <li key={r} className="flex items-start gap-3 text-[13px] text-zinc-600">
+                    <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0" />{r}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <h2 className="font-display text-[18px] font-extrabold text-zinc-950">Reviews</h2>
+                <div className="flex items-center gap-1.5 bg-zinc-950 text-white rounded-xl px-3 py-1.5">
+                  <Star className="h-3.5 w-3.5 text-amber-400" fill="currentColor" />
+                  <span className="text-[13px] font-bold tabular-nums">{space.rating}</span>
+                  <span className="text-[12px] text-zinc-400">({space.reviewCount})</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {space.reviews.map(r => (
+                  <motion.div key={r.id} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className="bg-white rounded-2xl p-5 border border-zinc-200/60 shadow-sm">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <img src={r.avatar} alt={r.author} className="h-10 w-10 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0" />
+                        <div>
+                          <p className="text-[13px] font-bold text-zinc-900">{r.author}</p>
+                          <p className="text-[11px] text-zinc-400 mt-0.5">{r.date}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-0.5 mt-0.5">
+                        {Array.from({ length: r.rating }).map((_, i) => <Star key={i} className="h-3 w-3 text-amber-500" fill="currentColor" />)}
+                      </div>
+                    </div>
+                    <p className="text-[13px] text-zinc-600 leading-relaxed">{r.text}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
+
           <div className="hidden lg:block w-[360px] flex-shrink-0 sticky top-[88px]">
             <BookingWidget priceHour={space.priceHour} priceDay={space.priceDay} priceMonth={space.priceMonth}
-              isInstantBook={space.isInstantBook} spaceId={space.id} />
+              isInstantBook={space.isInstantBook} name={space.name} spaceId={space.id} />
+            <div className="mt-4 bg-white rounded-2xl border border-zinc-200/60 shadow-sm p-5">
+              <div className="flex items-center gap-2.5 mb-2">
+                <CheckCircle className="h-4 w-4 text-emerald-500" strokeWidth={2} />
+                <span className="text-[13px] font-bold text-zinc-900">Free cancellation</span>
+              </div>
+              <p className="text-[12px] text-zinc-500 leading-relaxed">Cancel before check-in for a full refund. No questions asked.</p>
+            </div>
+            <p className="mt-4 text-center text-[11.5px] text-zinc-400 leading-snug">You will not be charged yet. Price shown excludes local taxes.</p>
           </div>
         </div>
+
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-zinc-200 bg-white/95 backdrop-blur-sm px-4 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-[20px] font-extrabold text-zinc-950 tabular-nums">EUR{space.priceDay}</span>
+            <span className="text-[13px] text-zinc-400 ml-1">/ day</span>
+          </div>
+          <button type="button" className="rounded-xl bg-blue-600 px-6 py-3 text-[14px] font-bold text-white hover:bg-blue-700 active:scale-[0.97] transition-all shadow-md shadow-blue-600/25 flex items-center gap-2">
+            {space.isInstantBook ? <><Zap className="h-4 w-4" fill="currentColor" /> Book now</> : "Request to book"}
+          </button>
+        </div>
       </div>
+
+      </div>
+
       <Footer />
     </div>
   );
