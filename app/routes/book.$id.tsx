@@ -41,6 +41,7 @@ function SuccessScreen({ spaceName, date, code }: { spaceName: string; date: str
           <p className="font-mono text-[36px] font-bold tracking-[0.18em] text-zinc-950">{code}</p>
           <p className="text-[12px] text-zinc-400 mt-2">Valid on your booking date. Show at reception or enter on the keypad.</p>
         </div>
+        <p className="text-[12px] text-zinc-400 mb-4">A confirmation has been sent to your email.</p>
         <div className="flex gap-3">
           <Link to="/"
             className="flex-1 rounded-xl border border-zinc-200 bg-white py-3 text-[13.5px] font-bold text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50 transition-all text-center">
