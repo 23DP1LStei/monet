@@ -384,7 +384,8 @@ export default function Search() {
 
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Price mode toggle */}
-            <div className="hidden sm:flex items-center rounded-xl bg-zinc-100 p-0.5 text-[12px] font-semibold">
+            {/* visible on all screens now */}
+            <div className="flex items-center rounded-xl bg-zinc-100 p-0.5 text-[12px] font-semibold">
               {(["hour", "day", "month"] as PriceMode[]).map(m => (
                 <button key={m} type="button" onClick={() => setPriceMode(m)}
                   className={`rounded-[10px] px-2.5 py-1.5 transition-all duration-200 ${priceMode === m ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"}`}>
