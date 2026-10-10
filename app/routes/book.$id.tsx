@@ -319,7 +319,7 @@ export default function BookSpace() {
                     ) : (
                       <>
                         <Lock className="h-4 w-4" strokeWidth={2} />
-                        Confirm & pay — Γé¼{total}
+                        Confirm & pay — €{total}
                       </>
                     )}
                   </button>
@@ -385,16 +385,16 @@ export default function BookSpace() {
               <div className="p-5 border-b border-zinc-100 space-y-2.5 text-[13px]">
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-3">Price breakdown</h3>
                 <div className="flex justify-between text-zinc-600">
-                  <span>Γé¼{price} ├ù {desks} {desks === 1 ? "desk" : "desks"}</span>
-                  <span className="tabular-nums">Γé¼{subtotal}</span>
+                  <span>€{price} ├ù {desks} {desks === 1 ? "desk" : "desks"}</span>
+                  <span className="tabular-nums">€{subtotal}</span>
                 </div>
                 <div className="flex justify-between text-zinc-600">
                   <span>Service fee (8%)</span>
-                  <span className="tabular-nums">Γé¼{serviceFee}</span>
+                  <span className="tabular-nums">€{serviceFee}</span>
                 </div>
                 <div className="flex justify-between font-extrabold text-zinc-950 text-[15px] pt-2 border-t border-zinc-100">
                   <span>Total</span>
-                  <span className="tabular-nums">Γé¼{total}</span>
+                  <span className="tabular-nums">€{total}</span>
                 </div>
               </div>
 

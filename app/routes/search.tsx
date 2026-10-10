@@ -142,7 +142,7 @@ function SpaceCardRow({ space, priceMode }: { space: CoworkingSpace; priceMode: 
         {/* Bottom row */}
         <div className="mt-4 flex items-end justify-between">
           <div>
-            <span className="text-[22px] font-extrabold text-zinc-950 tabular-nums leading-none">Γé¼{price}</span>
+            <span className="text-[22px] font-extrabold text-zinc-950 tabular-nums leading-none">€{price}</span>
             <span className="text-[13px] text-zinc-400 ml-1">/ {label}</span>
           </div>
           <Link to={`/space/${space.id}`}
@@ -246,14 +246,14 @@ function FilterSidebar({
         </FilterSection>
 
         {/* Price / day */}
-        <FilterSection title={`Max price / day: Γé¼${filters.maxPrice}`}>
+        <FilterSection title={`Max price / day: €${filters.maxPrice}`}>
           <input type="range" min={10} max={200} step={5}
             value={filters.maxPrice}
             onChange={e => set({ maxPrice: Number(e.target.value) })}
             className="w-full h-1.5 rounded-full accent-blue-600 cursor-pointer" />
           <div className="flex justify-between mt-1.5">
-            <span className="text-[11px] text-zinc-400 font-medium">Γé¼10</span>
-            <span className="text-[11px] text-zinc-400 font-medium">Γé¼200</span>
+            <span className="text-[11px] text-zinc-400 font-medium">€10</span>
+            <span className="text-[11px] text-zinc-400 font-medium">€200</span>
           </div>
         </FilterSection>
 

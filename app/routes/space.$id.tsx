@@ -55,7 +55,7 @@ function GalleryModal({ images, startIndex, onClose }: { images: string[]; start
 }
 
 function BookingWidget({ priceHour, priceDay, priceMonth, isInstantBook, name, spaceId }: {
-  priceHour: number; priceDay: number; priceMonth: number; isInstantBook: boolean; name: string; spaceId: string;) {
+  priceHour: number; priceDay: number; priceMonth: number; isInstantBook: boolean; name: string; spaceId: string; }) {
   const navigate = useNavigate();
   const [priceMode, setPriceMode] = useState<PriceMode>("day");
   const [date, setDate] = useState("");
@@ -282,7 +282,9 @@ export default function SpaceDetail() {
             <span className="text-[20px] font-extrabold text-zinc-950 tabular-nums">EUR{space.priceDay}</span>
             <span className="text-[13px] text-zinc-400 ml-1">/ day</span>
           </div>
-          <button type="button" className="rounded-xl bg-blue-600 px-6 py-3 text-[14px] font-bold text-white hover:bg-blue-700 active:scale-[0.97] transition-all shadow-md shadow-blue-600/25 flex items-center gap-2">
+          <button type="button"
+            onClick={() => navigate(`/book/${space.id}`)}
+            className="rounded-xl bg-blue-600 px-6 py-3 text-[14px] font-bold text-white hover:bg-blue-700 active:scale-[0.97] transition-all shadow-md shadow-blue-600/25 flex items-center gap-2">
             {space.isInstantBook ? <><Zap className="h-4 w-4" fill="currentColor" /> Book now</> : "Request to book"}
           </button>
         </div>
