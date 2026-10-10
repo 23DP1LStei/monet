@@ -8,3 +8,4 @@ export default [
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
 ] satisfies RouteConfig;
+// last updated: Oct 10 2026
