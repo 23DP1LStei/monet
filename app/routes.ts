@@ -7,5 +7,6 @@ export default [
   route("book/:id", "routes/book.$id.tsx"),
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
+  route("mybookings", "routes/mybookings.tsx"),
 ] satisfies RouteConfig;
 // last updated: Oct 10 2026
