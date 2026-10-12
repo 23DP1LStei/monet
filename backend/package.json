@@ -1,20 +1,29 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Express.js backend server",
+  "description": "Express.js backend server for Monet Coworking System",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "db:init": "node src/db/init.js",
+    "test": "node --test tests/auth.test.js"
   },
-  "keywords": [],
+  "keywords": [
+    "monet",
+    "coworking",
+    "auth",
+    "express"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.12.0"
   }
 }
-
