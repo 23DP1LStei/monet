@@ -34,7 +34,7 @@ export default function Home() {
       {/* Hero */}
       <section className="hero-section relative overflow-hidden pt-20 pb-16 sm:pt-24 sm:pb-20">
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[420px] rounded-full bg-amber-300/20 blur-[100px]" />
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-175 h-105 rounded-full bg-amber-300/20 blur-[100px]" />
           <div className="absolute top-20 -left-32 w-80 h-80 rounded-full bg-blue-400/10 blur-[80px]" />
           <div className="absolute top-10 -right-32 w-96 h-96 rounded-full bg-sky-300/12 blur-[90px]" />
         </div>
@@ -56,7 +56,7 @@ export default function Home() {
             <br />
             <span className="relative">
               <span className="relative z-10">Do your best work.</span>
-              <span aria-hidden className="absolute bottom-1 left-0 right-0 h-3 bg-amber-300/40 rounded-full -z-0" />
+              <span aria-hidden className="absolute bottom-1 left-0 right-0 h-3 bg-amber-300/40 rounded-full z-0" />
             </span>
           </motion.h1>
 
@@ -144,7 +144,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="md:row-span-2 relative overflow-hidden rounded-3xl bg-zinc-950 p-8 min-h-[340px] flex flex-col justify-between">
+              className="md:row-span-2 relative overflow-hidden rounded-3xl bg-zinc-950 p-8 min-h-85 flex flex-col justify-between">
               <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_30%_0%,rgba(251,191,36,0.14),transparent_65%)]" />
               <div className="relative z-10">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400/15 border border-amber-400/20 mb-6">

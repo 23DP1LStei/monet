@@ -13,12 +13,12 @@ import { COWORKING_SPACES, type CoworkingSpace } from "../data/coworkings";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Search Spaces — Monet" },
+    { title: "Search Spaces ΓÇö Monet" },
     { name: "description", content: "Find and book coworking spaces, dedicated desks and meeting rooms across Europe." },
   ];
 }
 
-/* ─── Types ───────────────────────────────────────────── */
+/* ΓöÇΓöÇΓöÇ Types ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 type SortKey = "recommended" | "price_asc" | "price_desc" | "rating";
 type PriceMode = "hour" | "day" | "month";
 type SpaceType = "hot-desk" | "dedicated" | "private-office" | "meeting-room";
@@ -42,12 +42,12 @@ const ALL_AMENITIES = Object.keys(AMENITY_ICONS);
 const CITIES = ["Riga", "Tallinn", "Vilnius", "Berlin"];
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "recommended",  label: "Recommended" },
-  { key: "price_asc",    label: "Price: low → high" },
-  { key: "price_desc",   label: "Price: high → low" },
+  { key: "price_asc",    label: "Price: low ΓåÆ high" },
+  { key: "price_desc",   label: "Price: high ΓåÆ low" },
   { key: "rating",       label: "Top rated" },
 ];
 
-/* ─── Horizontal SpaceCard ────────────────────────────── */
+/* ΓöÇΓöÇΓöÇ Horizontal SpaceCard ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 function SpaceCardRow({ space, priceMode }: { space: CoworkingSpace; priceMode: PriceMode }) {
   const [imgIdx, setImgIdx] = useState(0);
   const [saved,  setSaved]  = useState(false);
@@ -155,7 +155,7 @@ function SpaceCardRow({ space, priceMode }: { space: CoworkingSpace; priceMode: 
   );
 }
 
-/* ─── Filter Sidebar ──────────────────────────────────── */
+/* ΓöÇΓöÇΓöÇ Filter Sidebar ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 interface Filters {
   cities: string[];
   types: SpaceType[];
@@ -336,7 +336,7 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
   );
 }
 
-/* ─── Page ────────────────────────────────────────────── */
+/* ΓöÇΓöÇΓöÇ Page ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 export default function Search() {
   const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
@@ -378,13 +378,14 @@ export default function Search() {
             <span className="font-semibold text-zinc-800 truncate">
               {locationParam || "All cities"}
             </span>
-            <span className="hidden sm:inline">·</span>
+            <span className="hidden sm:inline">┬╖</span>
             <span className="hidden sm:inline font-medium">{results.length} spaces</span>
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Price mode toggle */}
-            <div className="hidden sm:flex items-center rounded-xl bg-zinc-100 p-0.5 text-[12px] font-semibold">
+            {/* visible on all screens now */}
+            <div className="flex items-center rounded-xl bg-zinc-100 p-0.5 text-[12px] font-semibold">
               {(["hour", "day", "month"] as PriceMode[]).map(m => (
                 <button key={m} type="button" onClick={() => setPriceMode(m)}
                   className={`rounded-[10px] px-2.5 py-1.5 transition-all duration-200 ${priceMode === m ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"}`}>
@@ -428,7 +429,7 @@ export default function Search() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-6 items-start">
 
-          {/* ── Results list (left) ── */}
+          {/* ΓöÇΓöÇ Results list (left) ΓöÇΓöÇ */}
           <div className="flex-1 min-w-0">
             <AnimatePresence mode="popLayout">
               {results.length > 0 ? (
@@ -452,7 +453,7 @@ export default function Search() {
             </AnimatePresence>
           </div>
 
-          {/* ── Filter sidebar (right, sticky) ── */}
+          {/* ΓöÇΓöÇ Filter sidebar (right, sticky) ΓöÇΓöÇ */}
           <div className="hidden lg:block w-[300px] flex-shrink-0 sticky top-[120px]">
             <FilterSidebar filters={filters} onChange={setFilters} total={results.length} />
           </div>
