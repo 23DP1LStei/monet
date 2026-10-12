@@ -8,7 +8,7 @@
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
     "db:init": "node src/db/init.js",
-    "test": "node --test tests/auth.test.js"
+    "test": "node --test tests/auth.test.js tests/spaces.test.js"
   },
   "keywords": [
     "monet",

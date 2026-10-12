@@ -1,5 +1,8 @@
 # 🏢 Monet Kopstrādes Sistēma — Aizmugursistēmas (Backend) API
 
+Sākumlapas telpu API: skatīt [MAIN_PAGE_API.md](MAIN_PAGE_API.md) — aktīvās telpas,
+lokācijas meklēšana, cenas, foto un vērtējumi, kā arī vēl saskaņojamās iespējas.
+
 Kopstrādes telpu nomas platformas **Monet** aizmugursistēmas serviss, kas izstrādāts uz **Node.js** un **Express.js** bāzes saskaņā ar dokumentā `monet_posms2.docx` noteiktajām prasībām, datubāzes struktūru un lietotāju lomu modeli.
 
 ---
