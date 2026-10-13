@@ -1,5 +1,13 @@
 import { authService, ConflictError, AuthenticationError } from '../services/authService.js';
 
+const AUTH_COOKIE = 'monet_auth';
+const authCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/',
+};
+
 export const authController = {
   /**
    * POST /api/auth/register
@@ -8,12 +16,12 @@ export const authController = {
   async register(req, res, next) {
     try {
       const { user, token } = await authService.register(req.body);
+      res.cookie(AUTH_COOKIE, token, authCookieOptions);
 
       return res.status(201).json({
         success: true,
         message: 'Lietotājs veiksmīgi reģistrēts.',
         user,
-        token,
       });
     } catch (err) {
       if (err instanceof ConflictError) {
@@ -34,12 +42,12 @@ export const authController = {
   async login(req, res, next) {
     try {
       const { user, token } = await authService.login(req.body);
+      res.cookie(AUTH_COOKIE, token, authCookieOptions);
 
       return res.status(200).json({
         success: true,
         message: 'Veiksmīga autorizācija.',
         user,
-        token,
       });
     } catch (err) {
       if (err instanceof AuthenticationError) {
@@ -81,6 +89,7 @@ export const authController = {
    * Izraksta lietotāju no sistēmas
    */
   async logout(req, res) {
+    res.clearCookie(AUTH_COOKIE, authCookieOptions);
     return res.status(200).json({
       success: true,
       message: 'Veiksmīgi izrakstījies no sistēmas.',

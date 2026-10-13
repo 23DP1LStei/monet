@@ -7,7 +7,14 @@ const JWT_SECRET = process.env.JWT_SECRET || 'monet_coworking_secret_jwt_key_202
  */
 export function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const cookieHeader = req.headers.cookie || '';
+  const authCookie = cookieHeader
+    .split(';')
+    .map((cookie) => cookie.trim())
+    .find((cookie) => cookie.startsWith('monet_auth='));
+  const cookieToken = authCookie ? authCookie.slice('monet_auth='.length) : null;
+  const token = cookieToken || bearerToken;
 
   if (!token) {
     return res.status(401).json({

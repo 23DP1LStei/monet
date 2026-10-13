@@ -105,8 +105,7 @@ Failā [`src/db/schema.sql`](file:///Users/leb/Documents/monet/backend/src/db/sc
       "role_id": 2,
       "role_name": "user",
       "created_at": "2026-10-12 10:30:00"
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    }
   }
   ```
 
@@ -135,15 +134,14 @@ Failā [`src/db/schema.sql`](file:///Users/leb/Documents/monet/backend/src/db/sc
       "role_id": 2,
       "role_name": "user",
       "created_at": "2026-10-12 10:30:00"
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    }
   }
   ```
 
 ### 4.3. Lietotāja profils
 - **Metode:** `GET`
 - **Ceļš:** `/api/auth/me`
-- **Galvene:** `Authorization: Bearer <token>`
+- Autentifikācija notiek ar `monet_auth` HttpOnly sīkdatni, ko serveris iestata pēc pieteikšanās vai reģistrācijas.
 - **Veiksmīga atbilde (`200 OK`):**
   ```json
   {
@@ -165,7 +163,7 @@ Failā [`src/db/schema.sql`](file:///Users/leb/Documents/monet/backend/src/db/sc
 ### 4.4. Izrakstīšanās
 - **Metode:** `POST`
 - **Ceļš:** `/api/auth/logout`
-- **Galvene:** `Authorization: Bearer <token>`
+- Izrakstīšanās notīra `monet_auth` sīkdatni.
 - **Veiksmīga atbilde (`200 OK`):**
   ```json
   {
