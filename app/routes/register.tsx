@@ -68,7 +68,7 @@ export function isValidEmail(email: string): boolean {
 
 export function isValidPassword(password: string): boolean {
     const MAX_PASSWORD_LENGTH = 50;
-    const MIN_PASSWORD_LENGTH = 7;
+    const MIN_PASSWORD_LENGTH = 8;
     
     const isInvalidInput =
         !password || password.length === 0 || password.length < MIN_PASSWORD_LENGTH || password.length > MAX_PASSWORD_LENGTH;
@@ -90,7 +90,7 @@ export function isValidUsername(username: string): boolean {
     const isInvalidInput =
         !username || username.length === 0 || username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH;
 
-    const usernameRegex = /^(?=.*[a-zA-Z])(?=.*\d).{8,50}$/;
+    const usernameRegex = /^(?=.*[a-zA-Z])(?=.*\d).{3,20}$/;
 
     if (usernameRegex.test(username) && !isInvalidInput) {
         return true;
