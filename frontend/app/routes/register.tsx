@@ -1,18 +1,14 @@
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { Building2 } from "lucide-react";
+import { Link } from "react-router";
 import axiosInstance from '../axios';
 
-const isClient = typeof window !== 'undefined';
-const fnameError = isClient ? document.getElementById('fnameError') : null;
-const surnameError = isClient ? document.getElementById('surnameError') : null;
-const usernameError = isClient ? document.getElementById('usernameError') : null;
-const emailError = isClient ? document.getElementById('emailError') : null;
-const phoneNumberError = isClient ? document.getElementById('phoneNumberError') : null;
-const passwordError = isClient ? document.getElementById('passwordError') : null;
-
-function showError(el: any, message: string) {
-  el.innerHTML = message;
+function showError(elementId: string, message: string) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = message;
+    }
 }
 
 export function isValidFisrtName(fname: string): boolean {
@@ -24,9 +20,10 @@ export function isValidFisrtName(fname: string): boolean {
     const fnameRegex = /^[^\d]+$/;
 
     if (fnameRegex.test(fname) && !isInvalidInput) {
+        showError("fnameError", "");
         return true;
     } else {
-        showError(fnameError, "Name should be 50 characters or less and without numbers.");
+        showError("fnameError", "Name should be 50 characters or less and without numbers.");
         return false;
     }
 
@@ -41,9 +38,10 @@ export function isValidSurname(surname: string): boolean {
     const lnameRegex = /^[^\d]+$/;
 
     if (lnameRegex.test(surname) && !isInvalidInput) {
+        showError("surnameError", "");
         return true;
     } else {
-        showError(surnameError, "Name should be 50 characters or less and without numbers.");
+        showError("surnameError", "Name should be 50 characters or less and without numbers.");
         return false;
     }
 
@@ -58,9 +56,10 @@ export function isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (emailRegex.test(email) && !isInvalidInput) {
+        showError("emailError", "");
         return true;
     } else {
-        showError(emailError, "Enter a valid email address.");
+        showError("emailError", "Enter a valid email address.");
         return false;
     }
 
@@ -76,9 +75,10 @@ export function isValidPassword(password: string): boolean {
     const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{8,50}$/;
 
     if (passwordRegex.test(password) && !isInvalidInput) {
+        showError("passwordError", "");
         return true;
     } else {
-        showError(passwordError, "Password must be at least 7 characters.");
+        showError("passwordError", "Password must be at least 7 characters.");
         return false;
     }
 }
@@ -93,9 +93,10 @@ export function isValidUsername(username: string): boolean {
     const usernameRegex = /^(?=.*[a-zA-Z])[a-zA-Z\d]{3,20}$/;
 
     if (usernameRegex.test(username) && !isInvalidInput) {
+        showError("usernameError", "");
         return true;
     } else {
-        showError(usernameError, "Username must be from 3 to 20 characters.");
+        showError("usernameError", "Username must be from 3 to 20 characters.");
         return false;
     }
 }
@@ -110,9 +111,10 @@ export function isValidPhoneNumber(phone_number: string): boolean {
     const phoneNumberRegex = /^\+?[0-9\s\-()]{7,15}$/;
 
     if (phoneNumberRegex.test(phone_number) && !isInvalidInput) {
+        showError("phoneNumberError", "");
         return true;
     } else {
-        showError(phoneNumberError, "Phone number must be from 7 to 15 digits.");
+        showError("phoneNumberError", "Phone number must be from 7 to 15 digits.");
         return false;
     }
 }
@@ -183,30 +185,30 @@ return (
             <div className="flex flex-row gap-3">
                 <div className="flex flex-col">
                     <label className="text-[12px] mb-1.25 text-[#3F3F46] font-semibold">First name</label>
-                    <input name="fname" className=" w-full bg-[#FAFAFA] outline outline-[#E4E4E7] mb-5 rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
-                    <p id="fnameError"></p>
+                    <input name="fname" className=" w-full bg-[#FAFAFA] outline outline-[#E4E4E7] rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
+                    <p id="fnameError" className="text-red-500 text-[12px] mt-1.25 mb-5 "></p>
                 </div>
                 <div className="flex flex-col">
                     <label className="text-[12px] mb-1.25 text-[#3F3F46] font-semibold">Last name</label>
-                    <input name="surname" className="w-full bg-[#FAFAFA] outline outline-[#E4E4E7] mb-5 rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
-                    <p id="surnameError"></p>
+                    <input name="surname" className="w-full bg-[#FAFAFA] outline outline-[#E4E4E7] rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
+                    <p id="surnameError" className="text-red-500 text-[12px] mt-1.25 mb-5"></p>
                 </div>
             </div>
             <label className="text-[12px] mb-1.25 text-[#3F3F46] font-semibold">Username</label>
-            <input name="username" className="bg-[#FAFAFA] outline outline-[#E4E4E7] mb-5 rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
-            <p id="usernameError"></p>
+            <input name="username" className="bg-[#FAFAFA] outline outline-[#E4E4E7] rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
+            <p id="usernameError" className="text-red-500 text-[12px] mt-1.25 mb-5"></p>
             <label className="text-[12px] mb-1.25 text-[#3F3F46] font-semibold">Email</label>
-            <input type="email" name="email" className="bg-[#FAFAFA] outline outline-[#E4E4E7] mb-5 rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
-            <p id="emailError"></p>
+            <input type="email" name="email" className="bg-[#FAFAFA] outline outline-[#E4E4E7] rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
+            <p id="emailError" className="text-red-500 text-[12px] mt-1.25 mb-5"></p>
             <label className="text-[12px] mb-1.25 text-[#3F3F46] font-semibold">Phone number</label>
-            <input type="tel" name="phone_number" className="bg-[#FAFAFA] outline outline-[#E4E4E7] mb-5 rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
-            <p id="phoneNumberError"></p>
+            <input type="tel" name="phone_number" className="bg-[#FAFAFA] outline outline-[#E4E4E7] rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
+            <p id="phoneNumberError" className="text-red-500 text-[12px] mt-1.25 mb-5"></p>
             <label className="text-[12px] mb-1.25 text-[#3F3F46] font-semibold">Password</label>
-            <input type="password" name="password" className="bg-[#FAFAFA] outline outline-[#E4E4E7] mb-5 rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
-            <p id="passwordError"></p>
+            <input type="password" name="password" className="bg-[#FAFAFA] outline outline-[#E4E4E7] rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
+            <p id="passwordError" className="text-red-500 text-[12px] mt-1.25 mb-5"></p>
             <input type="submit" value="Create Account" className="bg-[#09090B] hover:bg-zinc-800 transition-all cursor-pointer text-white font-bold text-[13px] rounded-full w-94.25 h-[43.5px] mb-6.25"/>
         </form>
-        <p className="text-center text-zinc-500 text-[12px] pt-3.75 border-t border-zinc-100">Already have an account?  <a href="#" className="font-bold text-black">Sign in</a></p>
+        <p className="text-center text-zinc-500 text-[12px] pt-3.75 border-t border-zinc-100">Already have an account?  <Link to="/login" className="font-bold text-black">Sign in</Link></p>
     </div>
     <Footer />
     </div>

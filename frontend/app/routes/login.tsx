@@ -1,15 +1,14 @@
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { Building2 } from "lucide-react";
+import { Link } from "react-router";
 import axiosInstance from '../axios';
 
-const isClient = typeof window !== 'undefined';
-const emailError = isClient ? document.getElementById('emailError') : null;
-const passwordError = isClient ? document.getElementById('passwordError') : null;
-
-
-function showError(el: any, message: string) {
-  el.innerHTML = message;
+function showError(elementId: string, message: string) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = message;
+    }
 }
 
 export function isValidEmail(email: string): boolean {
@@ -20,9 +19,10 @@ export function isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (emailRegex.test(email) && !isInvalidInput) {
+        showError("emailError", "");
         return true;
     } else {
-        showError(emailError, "Enter a valid email address.");
+        showError("emailError", "Enter a valid email address.");
         return false;
     }
 
@@ -38,9 +38,10 @@ export function isValidPassword(password: string): boolean {
     const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{8,50}$/;
 
     if (passwordRegex.test(password) && !isInvalidInput) {
+        showError("passwordError", "");
         return true;
     } else {
-        showError(passwordError, "Password must be at least 8 characters.");
+        showError("passwordError", "Password must be at least 8 characters.");
         return false;
     }
 }
@@ -102,14 +103,14 @@ return (
         <p className="text-center text-[12px] mb-5 text-zinc-500">Welcome back. Please enter your details.</p>
         <form className="flex flex-col" onSubmit={handleSubmit}>
             <label className="text-[12px] mb-1.25 text-[#3F3F46] font-semibold">Email</label>
-            <input type="email" name="email" className="bg-[#FAFAFA] outline outline-[#E4E4E7] mb-5 rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
-            <p id="emailError"></p>
-            <label className="text-[12px] mb-1.25 text-[#3F3F46] font-semibold">Password</label>
-            <input type="password" name="password" className="bg-[#FAFAFA] outline outline-[#E4E4E7] mb-3.75 rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
-            <p id="passwordError"></p>
-            <input type="submit" value="Continue" className="bg-[#09090B] hover:bg-zinc-800 transition-all cursor-pointer text-white font-bold text-[13px] rounded-full w-81.5 h-[43.5px] mb-6.25"/>
+            <input type="email" name="email" className="bg-[#FAFAFA] outline outline-[#E4E4E7]  rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
+            <p id="emailError" className="text-red-500 text-[12px] mt-1.25"></p>
+            <label className="text-[12px] mt-5 mb-1.25 text-[#3F3F46] font-semibold">Password</label>
+            <input type="password" name="password" className="bg-[#FAFAFA] outline outline-[#E4E4E7] mb-0 rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition"/>
+            <p id="passwordError" className="text-red-500 text-[12px] mt-1.25"></p>
+            <input type="submit" value="Continue" className="bg-[#09090B] hover:bg-zinc-800 transition-all cursor-pointer text-white font-bold text-[13px] rounded-full w-81.5 h-[43.5px] mt-3.75 mb-6.25"/>
         </form>
-        <p className="text-center text-zinc-500 text-[12px] pt-3.75 border-t border-zinc-100">Don't have an account?  <a href="#" className="font-bold text-black">Sign up</a></p>
+        <p className="text-center text-zinc-500 text-[12px] pt-3.75 border-t border-zinc-100">Don't have an account?  <Link to="/register" className="font-bold text-black">Sign up</Link></p>
     </div>
     <Footer />
     </div>
