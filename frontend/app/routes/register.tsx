@@ -1,7 +1,7 @@
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { Building2 } from "lucide-react";
-
+import axiosInstance from '../axios';
 
 const isClient = typeof window !== 'undefined';
 const fnameError = isClient ? document.getElementById('fnameError') : null;
@@ -90,7 +90,7 @@ export function isValidUsername(username: string): boolean {
     const isInvalidInput =
         !username || username.length === 0 || username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH;
 
-    const usernameRegex = /^(?=.*[a-zA-Z])(?=.*\d).{3,20}$/;
+    const usernameRegex = /^[a-zA-Z]{3,20}$/;
 
     if (usernameRegex.test(username) && !isInvalidInput) {
         return true;
@@ -117,8 +117,29 @@ export function isValidPhoneNumber(phone_number: string): boolean {
     }
 }
 
+const register = async (payload: any) => {
+    try { 
+        
+        const response = await axiosInstance.post("/auth/register", payload);
+        console.log(response.data);
+        if (response.status === 201) {
+            // Store token in localStorage
+            localStorage.setItem('auth_token', response.data.api_token);
+            localStorage.setItem('csrf_token', response.data.csrf_token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+            
+            // Update axios default header with token
+            axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.api_token}`;
+            axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] = response.data.csrf_token;
+            
+            window.location.href = "/";
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
 
-export default function Register() {
+export default function RegisterPage() {
     function handleSubmit(e: any) {
         // Prevent the browser from reloading the page
         e.preventDefault();
@@ -140,7 +161,9 @@ export default function Register() {
         let validPhoneNumber = isValidPhoneNumber(String(phone_number));
         let validPassword = isValidPassword(String(password));
 
-        
+        if (validfname && validsurname && validusername && validEmail && validPhoneNumber && validPassword) {
+            register(formData);
+        }
     }
 return (
     <div>
