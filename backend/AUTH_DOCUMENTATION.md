@@ -49,8 +49,7 @@ Klients (Frontend)
 Saskaņā ar dokumenta sadaļu **2.1.1 "Ieejas informācijas apraksts"** ir realizētas visas prasības:
 
 | Lauks | Tips | Prasība specifikācijā | Realizētā validācija un Regex | Kļūda |
-|---|---|---|---|---|
-| **`username`** | `VARCHAR(20)` | Min 3, max 20, burti un vismaz viens cipars | `/^(?=.*[a-zA-Z])(?=.*\d).{3,20}$/` | `400` vai `409` |
+| **`username`** | `VARCHAR(20)` | Min 3, max 20 (cipari nav obligāti) | `/^[a-zA-Z0-9_.-]{3,20}$/` | `400` vai `409` |
 | **`fname`** | `VARCHAR(50)` | Līdz 50 simboliem, bez cipariem | `/^[^\d]+$/` | `400` |
 | **`surname`** | `VARCHAR(50)` | Līdz 50 simboliem, bez cipariem | `/^[^\d]+$/` | `400` |
 | **`email`** | `VARCHAR(50)` | Līdz 50 simboliem, derīgs e-pasts | `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` | `400` vai `409` |

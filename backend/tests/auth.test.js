@@ -102,7 +102,7 @@ test('2. Reģistrācija - Veiksmīga reģistrācija ar derīgiem datiem atbilsto
   assert.equal(res.data.user.password_hash, undefined);
 });
 
-test('3. Reģistrācija - Lietotājvārda (username) validācija: min 3, max 20, burti un vismaz viens cipars', async () => {
+test('3. Reģistrācija - Lietotājvārda (username) validācija: min 3, max 20, cipari nav obligāti', async () => {
   // Pārāk īss (< 3 simboli)
   const resShort = await runMiddlewareChain([validateRegister, authController.register], {
     body: { username: 'j1', fname: 'Anna', surname: 'Liepa', email: 'a1@mail.com', phone_number: '+37120000001', password: 'Password123' },
@@ -117,12 +117,20 @@ test('3. Reģistrācija - Lietotājvārda (username) validācija: min 3, max 20,
   assert.equal(resLong.status, 400);
   assert.ok(resLong.data.errors.some((e) => e.field === 'username'));
 
-  // Bez cipariem (tikai burti)
+  // Bez cipariem (tikai burti) - JĀBŪT VEIKSMĪGAM!
   const resNoDigits = await runMiddlewareChain([validateRegister, authController.register], {
     body: { username: 'annaliepa', fname: 'Anna', surname: 'Liepa', email: 'a3@mail.com', phone_number: '+37120000003', password: 'Password123' },
   });
-  assert.equal(resNoDigits.status, 400);
-  assert.ok(resNoDigits.data.errors.some((e) => e.field === 'username'));
+  assert.equal(resNoDigits.status, 201);
+  assert.equal(resNoDigits.data.success, true);
+  assert.equal(resNoDigits.data.user.username, 'annaliepa');
+
+  // Nederīgi simboli (piemēram, atstarpe vai @)
+  const resBadChars = await runMiddlewareChain([validateRegister, authController.register], {
+    body: { username: 'user@name', fname: 'Anna', surname: 'Liepa', email: 'a4@mail.com', phone_number: '+37120000004', password: 'Password123' },
+  });
+  assert.equal(resBadChars.status, 400);
+  assert.ok(resBadChars.data.errors.some((e) => e.field === 'username'));
 });
 
 test('4. Reģistrācija - Vārda (fname) un uzvārda (surname) validācija: līdz 50, bez cipariem', async () => {
