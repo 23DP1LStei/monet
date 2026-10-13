@@ -87,20 +87,35 @@ export const authService = {
     const createdAt = currentSqlDatetime();
 
     // 4. Saglabā jauno lietotāju datubāzē
-    const insertResult = await query(
-      `INSERT INTO users (username, fname, surname, email, phone_number, role_id, password_hash, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        trimmedUsername,
-        fname.trim(),
-        surname.trim(),
-        trimmedEmail,
-        trimmedPhone,
-        roleId,
-        passwordHash,
-        createdAt,
-      ]
-    );
+    let insertResult;
+    try {
+      insertResult = await query(
+        `INSERT INTO users (username, fname, surname, email, phone_number, role_id, password_hash, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          trimmedUsername,
+          fname.trim(),
+          surname.trim(),
+          trimmedEmail,
+          trimmedPhone,
+          roleId,
+          passwordHash,
+          createdAt,
+        ]
+      );
+    } catch (dbErr) {
+      const errMsg = dbErr.message || '';
+      if (errMsg.includes('users.email') || errMsg.includes("key 'email'") || (dbErr.code === 'ER_DUP_ENTRY' && errMsg.includes('email'))) {
+        throw new ConflictError('E-pasta adrese jau ir reģistrēta.', 'email');
+      }
+      if (errMsg.includes('users.username') || errMsg.includes("key 'username'") || (dbErr.code === 'ER_DUP_ENTRY' && errMsg.includes('username'))) {
+        throw new ConflictError('Lietotājvārds jau ir aizņemts.', 'username');
+      }
+      if (errMsg.includes('users.phone_number') || errMsg.includes("key 'phone_number'") || (dbErr.code === 'ER_DUP_ENTRY' && errMsg.includes('phone_number'))) {
+        throw new ConflictError('Tālruņa numurs jau ir reģistrēts.', 'phone_number');
+      }
+      throw dbErr;
+    }
 
     let newUserId = insertResult.insertId;
     if (!newUserId) {

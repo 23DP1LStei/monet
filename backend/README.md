@@ -47,14 +47,14 @@ Kopstrādes telpu nomas platformas **Monet** aizmugursistēmas serviss, kas izst
 
 Saskaņā ar dokumenta sadaļu **2.1.1 "Ieejas informācijas apraksts"** ir realizētas šādas validācijas pārbaudes:
 
-| Lauks | Tips | Prasība specifikācijā | Realizētā pārbaude | Kļūdas kods un paziņojums |
+| Lauks | Tips | Prasība specifikācijā | Realizētā pārbaude un Regex | Kļūdas kods un paziņojums |
 |---|---|---|---|---|
-| **`username`** | `VARCHAR(20)` | Unikāls lietotāja vārds, maks. 20 simboli (piem., *„jānis123”*) | Obligāts, 1–20 simboli, unikalitāte datubāzē | `400` ("Lietotājvārds nedrīkst pārsniegt 20 simbolus.") vai `409` ("Lietotājvārds jau ir aizņemts.") |
-| **`fname`** | `VARCHAR(50)` | Lietotāja vārds, maks. 50 simboli (piem., *„Jānis”*) | Obligāts, 1–50 simboli | `400` ("Vārds ir obligāts lauks.") |
-| **`surname`** | `VARCHAR(50)` | Lietotāja uzvārds, maks. 50 simboli (piem., *„Bērziņš”*) | Obligāts, 1–50 simboli | `400` ("Uzvārds ir obligāts lauks.") |
-| **`email`** | `VARCHAR(255)` | Unikāls e-pasts, maks. 255 simboli (piem., *„janis@mail.com”*) | Obligāts, derīgs e-pasta formāts, unikalitāte | `400` ("Nederīgs e-pasta adreses formāts.") vai `409` ("E-pasta adrese jau ir reģistrēta.") |
-| **`phone_number`** | `VARCHAR(15)` | Unikāls tālrunis, maks. 15 simboli (piem., *„+37120000000”*) | Obligāts, derīgs tālruņa formāts, unikalitāte | `400` ("Nederīgs tālruņa numura formāts.") vai `409` ("Tālruņa numurs jau ir reģistrēts.") |
-| **`password`** | `VARCHAR(255)` | *„Parolei jābūt vismaz 7 simbolu garai, un obligāti jāiekļauj gan burti, gan cipari”* | Vismaz 7 simboli, obligāti jāsatur gan burti, gan cipari | `400` ("Parolē obligāti jāiekļauj gan burti, gan cipari.") |
+| **`username`** | `VARCHAR(20)` | Min 3, max 20, burti un vismaz viens cipars | `/^(?=.*[a-zA-Z])(?=.*\d).{3,20}$/` | `400` ("Lietotājvārdam obligāti jāsatur gan burti, gan cipari (3-20 simboli).") vai `409` ("Lietotājvārds jau ir aizņemts.") |
+| **`fname`** | `VARCHAR(50)` | Maks. 50 simboli, bez cipariem | `/^[^\d]+$/` | `400` ("Vārds nedrīkst saturēt ciparus.") |
+| **`surname`** | `VARCHAR(50)` | Maks. 50 simboli, bez cipariem | `/^[^\d]+$/` | `400` ("Uzvārds nedrīkst saturēt ciparus.") |
+| **`email`** | `VARCHAR(50)` | Maks. 50 simboli, derīgs e-pasta formāts | `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` | `400` ("Nederīgs e-pasta adreses formāts.") vai `409` ("E-pasta adrese jau ir reģistrēta.") |
+| **`phone_number`** | `VARCHAR(15)` | Min 7, max 15, cipari, un '+' / '(' / ')' / '-' neobligāti | `/^\+?[0-9\s\-()]{7,15}$/` | `400` ("Nederīgs tālruņa numura formāts.") vai `409` ("Tālruņa numurs jau ir reģistrēts.") |
+| **`password`** | `VARCHAR(255)` | Min 8, max 50, burti un vismaz viens cipars | `/^(?=.*[a-zA-Z])(?=.*\d).{8,50}$/` | `400` ("Parolei obligāti jāsatur gan burti, gan vismaz viens cipars (8-50 simboli).") |
 | **`role_id`** | `INT` | Ārējā atslēga uz `roles.role_id` | Pēc noklusējuma `2` (`user`) | `400` |
 
 ---
@@ -64,7 +64,7 @@ Saskaņā ar dokumenta sadaļu **2.1.1 "Ieejas informācijas apraksts"** ir real
 Failā [`src/db/schema.sql`](file:///Users/leb/Documents/monet/backend/src/db/schema.sql) ir definētas visas 7 tabulas atbilstoši dokumenta 5. nodaļai:
 
 - **`roles`** (5.1. Tabula): `role_id` (PK, INT AUTO_INC), `role_name` (VARCHAR(20) UNIQUE).
-- **`users`** (5.2. Tabula): `user_id` (PK, INT AUTO_INC), `username`, `fname`, `surname`, `email`, `phone_number`, `role_id` (FK), `password_hash`, `created_at`.
+- **`users`** (5.2. Tabula): `user_id` (PK, INT AUTO_INC), `username`, `fname`, `surname`, `email` (VARCHAR(50)), `phone_number`, `role_id` (FK), `password_hash`, `created_at` ar datubāzes līmeņa CHECK ierobežojumiem.
 - **`coworking_spaces`** (5.3. Tabula): `space_id` (PK), `creator_id` (FK), `space_name`, `address`, `space_description`, `available_spots`, `price_per_hour`, `price_per_day`, `is_active`, `created_at`.
 - **`photos`** (5.7. Tabula): `photo_id` (PK), `space_id` (FK), `photo_path`.
 - **`reservations`** (5.4. Tabula): `reservation_id` (PK), `space_id` (FK), `user_id` (FK), `reservation_type`, `guest_count`, `amount`, `start_time`, `end_time`, `reservation_status`, `created_at`.

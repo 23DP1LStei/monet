@@ -48,14 +48,14 @@ Klients (Frontend)
 
 Saskaņā ar dokumenta sadaļu **2.1.1 "Ieejas informācijas apraksts"** ir realizētas visas prasības:
 
-| Lauks | Tips | Prasība specifikācijā | Realizētā validācija | Kļūda |
+| Lauks | Tips | Prasība specifikācijā | Realizētā validācija un Regex | Kļūda |
 |---|---|---|---|---|
-| **`username`** | `VARCHAR(20)` | Unikāls lietotāja vārds, līdz 20 simboliem (*„jānis123”*) | Obligāts, 1–20 simboli, unikalitāte | `400` vai `409` |
-| **`fname`** | `VARCHAR(50)` | Lietotāja vārds, līdz 50 simboliem (*„Jānis”*) | Obligāts, 1–50 simboli | `400` |
-| **`surname`** | `VARCHAR(50)` | Lietotāja uzvārds, līdz 50 simboliem (*„Bērziņš”*) | Obligāts, 1–50 simboli | `400` |
-| **`email`** | `VARCHAR(255)` | Unikāla e-pasta adrese, līdz 255 simboliem (*„janis@mail.com”*) | Obligāts, derīgs e-pasts, unikalitāte | `400` vai `409` |
-| **`phone_number`** | `VARCHAR(15)` | Unikāls tālruņa numurs, līdz 15 simboliem (*„+37120000000”*) | Obligāts, tālruņa formāts, unikalitāte | `400` vai `409` |
-| **`password`** | `VARCHAR(255)` | *„Parolei jābūt vismaz 7 simbolu garai, un obligāti jāiekļauj gan burti, gan cipari”* | Vismaz 7 simboli, obligāti gan burti, gan cipari | `400` |
+| **`username`** | `VARCHAR(20)` | Min 3, max 20, burti un vismaz viens cipars | `/^(?=.*[a-zA-Z])(?=.*\d).{3,20}$/` | `400` vai `409` |
+| **`fname`** | `VARCHAR(50)` | Līdz 50 simboliem, bez cipariem | `/^[^\d]+$/` | `400` |
+| **`surname`** | `VARCHAR(50)` | Līdz 50 simboliem, bez cipariem | `/^[^\d]+$/` | `400` |
+| **`email`** | `VARCHAR(50)` | Līdz 50 simboliem, derīgs e-pasts | `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` | `400` vai `409` |
+| **`phone_number`** | `VARCHAR(15)` | Min 7, max 15, cipari, un '+' / '(' / ')' / '-' neobligāti | `/^\+?[0-9\s\-()]{7,15}$/` | `400` vai `409` |
+| **`password`** | `VARCHAR(255)` | Min 8, max 50, burti un vismaz viens cipars | `/^(?=.*[a-zA-Z])(?=.*\d).{8,50}$/` | `400` |
 | **`role_id`** | `INT (FK)` | Sasaiste ar lietotāja lomu tabulu | Pēc noklusējuma `2` (`user`) | `400` |
 
 ---
