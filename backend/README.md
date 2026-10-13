@@ -48,8 +48,7 @@ Kopstrādes telpu nomas platformas **Monet** aizmugursistēmas serviss, kas izst
 Saskaņā ar dokumenta sadaļu **2.1.1 "Ieejas informācijas apraksts"** ir realizētas šādas validācijas pārbaudes:
 
 | Lauks | Tips | Prasība specifikācijā | Realizētā pārbaude un Regex | Kļūdas kods un paziņojums |
-|---|---|---|---|---|
-| **`username`** | `VARCHAR(20)` | Min 3, max 20, burti un vismaz viens cipars | `/^(?=.*[a-zA-Z])(?=.*\d).{3,20}$/` | `400` ("Lietotājvārdam obligāti jāsatur gan burti, gan cipari (3-20 simboli).") vai `409` ("Lietotājvārds jau ir aizņemts.") |
+| **`username`** | `VARCHAR(20)` | Min 3, max 20 (cipari nav obligāti) | `/^[a-zA-Z0-9_.-]{3,20}$/` | `400` ("Lietotājvārda garumam jābūt no 3 līdz 20 simboliem.") vai `409` ("Lietotājvārds jau ir aizņemts.") |
 | **`fname`** | `VARCHAR(50)` | Maks. 50 simboli, bez cipariem | `/^[^\d]+$/` | `400` ("Vārds nedrīkst saturēt ciparus.") |
 | **`surname`** | `VARCHAR(50)` | Maks. 50 simboli, bez cipariem | `/^[^\d]+$/` | `400` ("Uzvārds nedrīkst saturēt ciparus.") |
 | **`email`** | `VARCHAR(50)` | Maks. 50 simboli, derīgs e-pasta formāts | `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` | `400` ("Nederīgs e-pasta adreses formāts.") vai `409` ("E-pasta adrese jau ir reģistrēta.") |

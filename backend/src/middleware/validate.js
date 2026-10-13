@@ -2,7 +2,7 @@
  * Validācijas starpprogrammatūras reģistrācijai un autorizācijai
  *
  * Validācijas parametri:
- * - Lietotājvārds (username): no 3 līdz 20 simboliem, jāsatur gan burti, gan cipari
+ * - Lietotājvārds (username): no 3 līdz 20 simboliem (cipari nav obligāti)
  * - Vārds (fname): līdz 50 simboliem, bez cipariem
  * - Uzvārds (surname): līdz 50 simboliem, bez cipariem
  * - E-pasts (email): līdz 50 simboliem, derīgs e-pasta formāts
@@ -14,7 +14,7 @@ const fnameRegex = /^[^\d]+$/;
 const lnameRegex = /^[^\d]+$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{8,50}$/;
-const usernameRegex = /^(?=.*[a-zA-Z])(?=.*\d).{3,20}$/;
+const usernameRegex = /^[a-zA-Z0-9_.-]{3,20}$/;
 const phoneNumberRegex = /^\+?[0-9\s\-()]{7,15}$/;
 
 /**
@@ -24,7 +24,7 @@ export function validateRegister(req, res, next) {
   const { username, fname, surname, email, phone_number, password } = req.body;
   const errors = [];
 
-  // 1. Lietotājvārds (username): min 3, max 20, burti un vismaz viens cipars
+  // 1. Lietotājvārds (username): min 3, max 20, cipari nav obligāti
   if (!username || typeof username !== 'string' || !username.trim()) {
     errors.push({ field: 'username', message: 'Lietotājvārds ir obligāts lauks.' });
   } else {
@@ -32,7 +32,7 @@ export function validateRegister(req, res, next) {
     if (trimmedUsername.length < 3 || trimmedUsername.length > 20) {
       errors.push({ field: 'username', message: 'Lietotājvārda garumam jābūt no 3 līdz 20 simboliem.' });
     } else if (!usernameRegex.test(trimmedUsername)) {
-      errors.push({ field: 'username', message: 'Lietotājvārdam obligāti jāsatur gan burti, gan cipari (3-20 simboli).' });
+      errors.push({ field: 'username', message: 'Lietotājvārdā atļauti tikai burti, cipari un simboli "_", "-", "." (3-20 simboli).' });
     }
   }
 
