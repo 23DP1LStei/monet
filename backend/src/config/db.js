@@ -79,11 +79,11 @@ function initSqliteTables() {
 
     CREATE TABLE IF NOT EXISTS users (
       user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT NOT NULL UNIQUE,
-      fname TEXT NOT NULL,
-      surname TEXT NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      phone_number TEXT NOT NULL UNIQUE,
+      username TEXT NOT NULL UNIQUE CHECK (length(username) >= 3 AND length(username) <= 20),
+      fname TEXT NOT NULL CHECK (length(fname) <= 50 AND fname NOT GLOB '*[0-9]*'),
+      surname TEXT NOT NULL CHECK (length(surname) <= 50 AND surname NOT GLOB '*[0-9]*'),
+      email TEXT NOT NULL UNIQUE CHECK (length(email) <= 50 AND email LIKE '%@%.%'),
+      phone_number TEXT NOT NULL UNIQUE CHECK (length(phone_number) >= 7 AND length(phone_number) <= 15),
       role_id INTEGER NOT NULL,
       password_hash TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),

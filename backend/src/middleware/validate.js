@@ -1,16 +1,21 @@
 /**
  * Validācijas starpprogrammatūras reģistrācijai un autorizācijai
- * Izstrādātas atbilstoši dokumenta monet_posms2.docx prasībām:
- * - username: unikāls, līdz 20 simboliem
- * - fname: līdz 50 simboliem
- * - surname: līdz 50 simboliem
- * - email: unikāls, derīgs e-pasta formāts, līdz 255 simboliem
- * - phone_number: unikāls, derīgs tālruņa formāts, līdz 15 simboliem
- * - password: vismaz 7 simboli, obligāti jāsatur gan burti, gan cipari
+ *
+ * Validācijas parametri:
+ * - Lietotājvārds (username): no 3 līdz 20 simboliem (cipari nav obligāti)
+ * - Vārds (fname): līdz 50 simboliem, bez cipariem
+ * - Uzvārds (surname): līdz 50 simboliem, bez cipariem
+ * - E-pasts (email): līdz 50 simboliem, derīgs e-pasta formāts
+ * - Tālruņa numurs (phone_number): no 7 līdz 15 simboliem, cipari un neobligāti '+', '(', ')', '-', atstarpes
+ * - Parole (password): no 8 līdz 50 simboliem, burti un vismaz viens cipars
  */
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^\+?[0-9\s\-()]{7,15}$/;
+const fnameRegex = /^[^\d]+$/;
+const lnameRegex = /^[^\d]+$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{8,50}$/;
+const usernameRegex = /^[a-zA-Z0-9_.-]{3,20}$/;
+const phoneNumberRegex = /^\+?[0-9\s\-()]{7,15}$/;
 
 /**
  * Reģistrācijas ievades datu validācija
@@ -19,62 +24,74 @@ export function validateRegister(req, res, next) {
   const { username, fname, surname, email, phone_number, password } = req.body;
   const errors = [];
 
-  // 1. Lietotājvārds (username)
+  // 1. Lietotājvārds (username): min 3, max 20, cipari nav obligāti
   if (!username || typeof username !== 'string' || !username.trim()) {
     errors.push({ field: 'username', message: 'Lietotājvārds ir obligāts lauks.' });
-  } else if (username.trim().length > 20) {
-    errors.push({ field: 'username', message: 'Lietotājvārds nedrīkst pārsniegt 20 simbolus.' });
+  } else {
+    const trimmedUsername = username.trim();
+    if (trimmedUsername.length < 3 || trimmedUsername.length > 20) {
+      errors.push({ field: 'username', message: 'Lietotājvārda garumam jābūt no 3 līdz 20 simboliem.' });
+    } else if (!usernameRegex.test(trimmedUsername)) {
+      errors.push({ field: 'username', message: 'Lietotājvārdā atļauti tikai burti, cipari un simboli "_", "-", "." (3-20 simboli).' });
+    }
   }
 
-  // 2. Vārds (fname)
+  // 2. Vārds (fname): max 50, bez cipariem
   if (!fname || typeof fname !== 'string' || !fname.trim()) {
     errors.push({ field: 'fname', message: 'Vārds ir obligāts lauks.' });
-  } else if (fname.trim().length > 50) {
-    errors.push({ field: 'fname', message: 'Vārds nedrīkst pārsniegt 50 simbolus.' });
+  } else {
+    const trimmedFname = fname.trim();
+    if (trimmedFname.length > 50) {
+      errors.push({ field: 'fname', message: 'Vārds nedrīkst pārsniegt 50 simbolus.' });
+    } else if (!fnameRegex.test(trimmedFname)) {
+      errors.push({ field: 'fname', message: 'Vārds nedrīkst saturēt ciparus.' });
+    }
   }
 
-  // 3. Uzvārds (surname)
+  // 3. Uzvārds (surname): max 50, bez cipariem
   if (!surname || typeof surname !== 'string' || !surname.trim()) {
     errors.push({ field: 'surname', message: 'Uzvārds ir obligāts lauks.' });
-  } else if (surname.trim().length > 50) {
-    errors.push({ field: 'surname', message: 'Uzvārds nedrīkst pārsniegt 50 simbolus.' });
+  } else {
+    const trimmedSurname = surname.trim();
+    if (trimmedSurname.length > 50) {
+      errors.push({ field: 'surname', message: 'Uzvārds nedrīkst pārsniegt 50 simbolus.' });
+    } else if (!lnameRegex.test(trimmedSurname)) {
+      errors.push({ field: 'surname', message: 'Uzvārds nedrīkst saturēt ciparus.' });
+    }
   }
 
-  // 4. E-pasts (email)
+  // 4. E-pasts (email): max 50, pārbauda formātu
   if (!email || typeof email !== 'string' || !email.trim()) {
     errors.push({ field: 'email', message: 'E-pasts ir obligāts lauks.' });
-  } else if (email.trim().length > 255) {
-    errors.push({ field: 'email', message: 'E-pasts nedrīkst pārsniegt 255 simbolus.' });
-  } else if (!EMAIL_REGEX.test(email.trim())) {
-    errors.push({ field: 'email', message: 'Nederīgs e-pasta adreses formāts.' });
+  } else {
+    const trimmedEmail = email.trim();
+    if (trimmedEmail.length > 50) {
+      errors.push({ field: 'email', message: 'E-pasts nedrīkst pārsniegt 50 simbolus.' });
+    } else if (!emailRegex.test(trimmedEmail)) {
+      errors.push({ field: 'email', message: 'Nederīgs e-pasta adreses formāts.' });
+    }
   }
 
-  // 5. Tālruņa numurs (phone_number)
+  // 5. Tālruņa numurs (phone_number): min 7, max 15, cipari, un '+' / '(' / ')' / '-' neobligāti
   if (!phone_number || typeof phone_number !== 'string' || !phone_number.trim()) {
     errors.push({ field: 'phone_number', message: 'Tālruņa numurs ir obligāts lauks.' });
   } else {
     const cleanedPhone = phone_number.trim();
-    if (cleanedPhone.length > 15) {
-      errors.push({ field: 'phone_number', message: 'Tālruņa numurs nedrīkst pārsniegt 15 simbolus.' });
-    } else if (!PHONE_REGEX.test(cleanedPhone)) {
-      errors.push({ field: 'phone_number', message: 'Nederīgs tālruņa numura formāts (piemēram, +37120000000).' });
+    if (cleanedPhone.length < 7 || cleanedPhone.length > 15) {
+      errors.push({ field: 'phone_number', message: 'Tālruņa numura garumam jābūt no 7 līdz 15 simboliem.' });
+    } else if (!phoneNumberRegex.test(cleanedPhone)) {
+      errors.push({ field: 'phone_number', message: 'Nederīgs tālruņa numura formāts (atļauti 7-15 cipari, kā arī \'+\', \'(\', \')\', \'-\' un atstarpes).' });
     }
   }
 
-  // 6. Parole (password): vismaz 7 simboli, obligāti gan burti, gan cipari
+  // 6. Parole (password): min 8, max 50, burti un vismaz viens cipars
   if (!password || typeof password !== 'string') {
     errors.push({ field: 'password', message: 'Parole ir obligāts lauks.' });
   } else {
-    if (password.length < 7) {
-      errors.push({ field: 'password', message: 'Parolei jābūt vismaz 7 simbolu garai.' });
-    }
-    const hasLetters = /[a-zA-Zа-яА-ЯāčēģīķļņšūžĀČĒĢĪĶĻŅŠŪŽ]/.test(password);
-    const hasDigits = /[0-9]/.test(password);
-    if (!hasLetters || !hasDigits) {
-      errors.push({
-        field: 'password',
-        message: 'Parolē obligāti jāiekļauj gan burti, gan cipari.',
-      });
+    if (password.length < 8 || password.length > 50) {
+      errors.push({ field: 'password', message: 'Paroles garumam jābūt no 8 līdz 50 simboliem.' });
+    } else if (!passwordRegex.test(password)) {
+      errors.push({ field: 'password', message: 'Parolei obligāti jāsatur gan burti, gan vismaz viens cipars (8-50 simboli).' });
     }
   }
 
@@ -99,10 +116,14 @@ export function validateLogin(req, res, next) {
 
   if (!loginId || typeof loginId !== 'string' || !loginId.trim()) {
     errors.push({ field: 'email', message: 'E-pasta adrese vai lietotājvārds ir obligāts lauks.' });
+  } else if (loginId.trim().length > 50) {
+    errors.push({ field: 'email', message: 'E-pasta adrese vai lietotājvārds nedrīkst pārsniegt 50 simbolus.' });
   }
 
   if (!password || typeof password !== 'string' || !password.trim()) {
     errors.push({ field: 'password', message: 'Parole ir obligāts lauks.' });
+  } else if (password.length > 50) {
+    errors.push({ field: 'password', message: 'Parole nedrīkst pārsniegt 50 simbolus.' });
   }
 
   if (errors.length > 0) {

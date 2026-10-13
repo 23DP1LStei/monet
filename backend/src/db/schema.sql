@@ -16,12 +16,17 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(20) NOT NULL UNIQUE,
   fname VARCHAR(50) NOT NULL,
   surname VARCHAR(50) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
+  email VARCHAR(50) NOT NULL UNIQUE,
   phone_number VARCHAR(15) NOT NULL UNIQUE,
   role_id INT NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles (role_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles (role_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT chk_users_username CHECK (CHAR_LENGTH(username) >= 3 AND CHAR_LENGTH(username) <= 20),
+  CONSTRAINT chk_users_fname CHECK (CHAR_LENGTH(fname) <= 50 AND fname NOT REGEXP '[0-9]'),
+  CONSTRAINT chk_users_surname CHECK (CHAR_LENGTH(surname) <= 50 AND surname NOT REGEXP '[0-9]'),
+  CONSTRAINT chk_users_email CHECK (CHAR_LENGTH(email) <= 50),
+  CONSTRAINT chk_users_phone CHECK (CHAR_LENGTH(phone_number) >= 7 AND CHAR_LENGTH(phone_number) <= 15)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 5.3. Tabula: coworking_spaces (Kopstrādes telpas)
