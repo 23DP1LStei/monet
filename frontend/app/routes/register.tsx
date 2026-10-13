@@ -90,7 +90,7 @@ export function isValidUsername(username: string): boolean {
     const isInvalidInput =
         !username || username.length === 0 || username.length < MIN_USERNAME_LENGTH || username.length > MAX_USERNAME_LENGTH;
 
-    const usernameRegex = /^[a-zA-Z]{3,20}$/;
+    const usernameRegex = /^(?=.*[a-zA-Z])[a-zA-Z\d]{3,20}$/;
 
     if (usernameRegex.test(username) && !isInvalidInput) {
         return true;
