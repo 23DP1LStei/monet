@@ -64,14 +64,45 @@ function calcAmount(startTime, endTime, pricePerHour, pricePerDay) {
   return parseFloat((diffHours * pricePerHour).toFixed(2));
 }
 
+/**
+ * Palīgfunkcija: droši parsē ērtību sarakstu no JSON vai string
+ */
+export function parseAmenities(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return typeof raw === 'string' ? raw.split(',').map((s) => s.trim()).filter(Boolean) : [];
+  }
+}
+
+/**
+ * Palīgfunkcija: serializē ērtību sarakstu uz JSON string glabāšanai DB
+ */
+export function serializeAmenities(raw) {
+  if (!raw) return '[]';
+  if (Array.isArray(raw)) return JSON.stringify(raw);
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return JSON.stringify(parsed);
+    } catch {}
+    const items = raw.split(',').map((s) => s.trim()).filter(Boolean);
+    return JSON.stringify(items);
+  }
+  return '[]';
+}
+
 // ─── Space Service ────────────────────────────────────────────────────────────
 
 export const spaceService = {
   /**
    * Atlasa aktīvās telpas ar filtrēšanu un lapošanu.
-   * Atbalstītie filtri: location, city, type, period, price_min, price_max, instant_book, limit, offset
+   * Atbalstītie filtri: location, city, type, period, price_min, price_max, instant_book, amenities, limit, offset
    */
-  async listSpaces({ location, city, type, period, price_min, price_max, instant_book, limit, offset }) {
+  async listSpaces({ location, city, type, period, price_min, price_max, instant_book, amenities, limit, offset }) {
     const params = [];
     const conditions = ['s.is_active = TRUE'];
 
@@ -108,6 +139,17 @@ export const spaceService = {
       conditions.push('s.is_instant_book = TRUE');
     }
 
+    if (amenities) {
+      const reqAmenities = Array.isArray(amenities)
+        ? amenities
+        : String(amenities).split(',').map((a) => a.trim().toLowerCase()).filter(Boolean);
+
+      for (const item of reqAmenities) {
+        conditions.push("LOWER(COALESCE(s.amenities, '[]')) LIKE ?");
+        params.push(`%"${item}"%`);
+      }
+    }
+
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100 ||
         !Number.isSafeInteger(offset) || offset < 0) {
       throw new ValidationError('Nederīgi lapošanas parametri.');
@@ -118,7 +160,7 @@ export const spaceService = {
     const { rows } = await query(
       `SELECT s.space_id, s.space_name, s.city, s.address, s.space_type,
               s.available_spots, s.price_per_hour, s.price_per_day,
-              s.is_instant_book,
+              s.is_instant_book, s.amenities,
               (SELECT p.photo_path FROM photos p
                WHERE p.space_id = s.space_id ORDER BY p.photo_id ASC LIMIT 1) AS photo_path,
               r.average_rating, COALESCE(r.review_count, 0) AS review_count
@@ -148,6 +190,7 @@ export const spaceService = {
         price: period === 'hour' ? pricePerHour : pricePerDay,
         price_period: period || 'day',
         is_instant_book: Boolean(row.is_instant_book),
+        amenities: parseAmenities(row.amenities),
         photo_path: row.photo_path ?? null,
         average_rating: row.average_rating === null ? null : Number(row.average_rating),
         review_count: Number(row.review_count),
@@ -163,7 +206,7 @@ export const spaceService = {
       `SELECT s.space_id, s.space_name, s.city, s.address, s.space_type,
               s.space_description, s.available_spots,
               s.price_per_hour, s.price_per_day,
-              s.is_instant_book, s.is_active, s.created_at,
+              s.is_instant_book, s.is_active, s.amenities, s.created_at,
               u.user_id AS creator_id, u.username AS creator_username,
               r.average_rating, COALESCE(r.review_count, 0) AS review_count
        FROM coworking_spaces s
@@ -199,6 +242,7 @@ export const spaceService = {
       price_per_hour: Number(space.price_per_hour),
       price_per_day: Number(space.price_per_day),
       is_instant_book: Boolean(space.is_instant_book),
+      amenities: parseAmenities(space.amenities),
       created_at: space.created_at,
       creator: {
         user_id: space.creator_id,
@@ -385,11 +429,13 @@ export const reservationService = {
     const { rows } = await query(
       `SELECT r.reservation_id, r.reservation_type, r.guest_count, r.amount,
               r.start_time, r.end_time, r.reservation_status, r.created_at,
-              s.space_id, s.space_name, s.city, s.address,
+              s.space_id, s.space_name, s.city, s.address, s.space_type,
               (SELECT p.photo_path FROM photos p WHERE p.space_id = s.space_id ORDER BY p.photo_id ASC LIMIT 1) AS photo_path,
-              rv.review_id
+              rv.review_id,
+              u.fname AS host_fname, u.surname AS host_surname, u.email AS host_email, u.phone_number AS host_phone
        FROM reservations r
        JOIN coworking_spaces s ON s.space_id = r.space_id
+       LEFT JOIN users u ON u.user_id = s.creator_id
        LEFT JOIN reviews rv ON rv.reservation_id = r.reservation_id
        WHERE r.user_id = ? ${statusFilter}
        ORDER BY r.start_time DESC
@@ -412,7 +458,13 @@ export const reservationService = {
         space_name: row.space_name,
         city: row.city || '',
         address: row.address,
+        space_type: row.space_type || 'hot-desk',
         photo_path: row.photo_path ?? null,
+        host: {
+          name: row.host_fname ? `${row.host_fname} ${row.host_surname}` : 'Monet Host',
+          email: row.host_email || 'support@monet.lv',
+          phone: row.host_phone || '+371 20 000 002',
+        },
       },
     }));
   },
@@ -533,4 +585,218 @@ export const reviewService = {
       },
     };
   },
+
+  /**
+   * Iegūst pārvaldītās telpas (landlord savas, admin visas)
+   */
+  async getManagedSpaces(userId, userRole) {
+    let sql = `
+      SELECT s.space_id, s.creator_id, s.space_name, s.city, s.address, s.space_type,
+             s.space_description, s.available_spots, s.price_per_hour, s.price_per_day,
+             s.is_instant_book, s.is_active, s.amenities, s.created_at,
+             (SELECT p.photo_path FROM photos p WHERE p.space_id = s.space_id ORDER BY p.photo_id ASC LIMIT 1) AS photo_path,
+             (SELECT COUNT(*) FROM reservations res WHERE res.space_id = s.space_id) AS total_bookings,
+             (SELECT COUNT(*) FROM reservations res WHERE res.space_id = s.space_id AND res.reservation_status = 'pending') AS pending_bookings
+      FROM coworking_spaces s
+    `;
+    const params = [];
+
+    if (userRole !== 'admin') {
+      sql += ' WHERE s.creator_id = ?';
+      params.push(userId);
+    }
+
+    sql += ' ORDER BY s.space_id DESC';
+
+    const { rows } = await query(sql, params);
+    return rows.map((r) => ({
+      ...r,
+      amenities: parseAmenities(r.amenities),
+    }));
+  },
+
+  /**
+   * Iegūst ienākošās rezervācijas (landlord savu telpu rezervācijas, admin visas)
+   */
+  async getManagedReservations(userId, userRole) {
+    let sql = `
+      SELECT res.reservation_id, res.space_id, res.user_id, res.reservation_type,
+             res.guest_count, res.amount, res.start_time, res.end_time,
+             res.reservation_status, res.created_at,
+             s.space_name, s.address, s.city,
+             u.fname, u.surname, u.email, u.phone_number, u.username
+      FROM reservations res
+      JOIN coworking_spaces s ON s.space_id = res.space_id
+      JOIN users u ON u.user_id = res.user_id
+    `;
+    const params = [];
+
+    if (userRole !== 'admin') {
+      sql += ' WHERE s.creator_id = ?';
+      params.push(userId);
+    }
+
+    sql += ' ORDER BY res.reservation_id DESC';
+
+    const { rows } = await query(sql, params);
+    return rows;
+  },
+
+  /**
+   * Izveido jaunu telpu
+   */
+  async createSpace(data, userId) {
+    const {
+      space_name,
+      city = 'Riga',
+      address,
+      space_type = 'hot-desk',
+      space_description = '',
+      available_spots = 10,
+      price_per_hour = 5.0,
+      price_per_day = 25.0,
+      photo_url = '',
+      amenities = [],
+    } = data;
+
+    if (!space_name || !address) {
+      throw new ValidationError('Telpas nosaukums un adrese ir obligāti.');
+    }
+
+    const amenitiesJson = serializeAmenities(amenities);
+    const now = toSqlDatetime(new Date());
+    const { insertId } = await query(
+      `INSERT INTO coworking_spaces
+       (creator_id, space_name, city, address, space_type, space_description, available_spots, price_per_hour, price_per_day, is_instant_book, is_active, amenities, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, ?, ?)`,
+      [
+        userId,
+        space_name.trim(),
+        city.trim(),
+        address.trim(),
+        space_type,
+        space_description.trim(),
+        Number(available_spots) || 1,
+        Number(price_per_hour) || 0,
+        Number(price_per_day) || 0,
+        amenitiesJson,
+        now,
+      ]
+    );
+
+    if (photo_url && photo_url.trim()) {
+      await query(
+        'INSERT INTO photos (space_id, photo_path) VALUES (?, ?)',
+        [insertId, photo_url.trim()]
+      );
+    }
+
+    const { rows } = await query('SELECT * FROM coworking_spaces WHERE space_id = ?', [insertId]);
+    return {
+      ...rows[0],
+      amenities: parseAmenities(rows[0]?.amenities),
+    };
+  },
+
+  /**
+   * Rediģē esošu telpu
+   */
+  async updateSpace(spaceId, data, userId, userRole) {
+    const { rows: existing } = await query('SELECT * FROM coworking_spaces WHERE space_id = ?', [spaceId]);
+    if (!existing || existing.length === 0) {
+      throw new NotFoundError('Telpa nav atrasta.');
+    }
+
+    const space = existing[0];
+    if (userRole !== 'admin' && space.creator_id !== userId) {
+      throw new ValidationError('Jums nav tiesību rediģēt šo telpu.');
+    }
+
+    const name = data.space_name !== undefined ? data.space_name.trim() : space.space_name;
+    const address = data.address !== undefined ? data.address.trim() : space.address;
+    const city = data.city !== undefined ? data.city.trim() : space.city;
+    const type = data.space_type !== undefined ? data.space_type : space.space_type;
+    const description = data.space_description !== undefined ? data.space_description.trim() : space.space_description;
+    const spots = data.available_spots !== undefined ? Number(data.available_spots) : space.available_spots;
+    const priceHour = data.price_per_hour !== undefined ? Number(data.price_per_hour) : space.price_per_hour;
+    const priceDay = data.price_per_day !== undefined ? Number(data.price_per_day) : space.price_per_day;
+    const isActive = data.is_active !== undefined ? (data.is_active ? 1 : 0) : space.is_active;
+    const amenitiesJson = data.amenities !== undefined ? serializeAmenities(data.amenities) : space.amenities;
+
+    await query(
+      `UPDATE coworking_spaces
+       SET space_name = ?, address = ?, city = ?, space_type = ?, space_description = ?,
+           available_spots = ?, price_per_hour = ?, price_per_day = ?, is_active = ?, amenities = ?
+       WHERE space_id = ?`,
+      [name, address, city, type, description, spots, priceHour, priceDay, isActive, amenitiesJson, spaceId]
+    );
+
+    const { rows: updated } = await query('SELECT * FROM coworking_spaces WHERE space_id = ?', [spaceId]);
+    return {
+      ...updated[0],
+      amenities: parseAmenities(updated[0]?.amenities),
+    };
+  },
+
+  /**
+   * Dzēš telpu
+   */
+  async deleteSpace(spaceId, userId, userRole) {
+    const { rows: existing } = await query('SELECT * FROM coworking_spaces WHERE space_id = ?', [spaceId]);
+    if (!existing || existing.length === 0) {
+      throw new NotFoundError('Telpa nav atrasta.');
+    }
+
+    const space = existing[0];
+    if (userRole !== 'admin' && space.creator_id !== userId) {
+      throw new ValidationError('Jums nav tiesību dzēst šo telpu.');
+    }
+
+    // Delete associated photos, reviews, payments & reservations
+    await query('DELETE FROM photos WHERE space_id = ?', [spaceId]);
+    await query('DELETE FROM reviews WHERE space_id = ?', [spaceId]);
+    await query('DELETE FROM payment_history WHERE reservation_id IN (SELECT reservation_id FROM reservations WHERE space_id = ?)', [spaceId]);
+    await query('DELETE FROM reservations WHERE space_id = ?', [spaceId]);
+    await query('DELETE FROM coworking_spaces WHERE space_id = ?', [spaceId]);
+
+    return { success: true, message: 'Telpa veiksmīgi dzēsta.' };
+  },
+
+  /**
+   * Atjaunina rezervācijas statusu (apstiprina vai noraida)
+   */
+  async updateReservationStatus(reservationId, status, userId, userRole) {
+    const { rows: existing } = await query(
+      `SELECT res.*, s.creator_id
+       FROM reservations res
+       JOIN coworking_spaces s ON s.space_id = res.space_id
+       WHERE res.reservation_id = ?`,
+      [reservationId]
+    );
+
+    if (!existing || existing.length === 0) {
+      throw new NotFoundError('Rezervācija nav atrasta.');
+    }
+
+    const validStatuses = ['confirmed', 'canceled', 'pending'];
+    if (!validStatuses.includes(status)) {
+      throw new ValidationError('Nederīgs statuss.');
+    }
+
+    await query(
+      'UPDATE reservations SET reservation_status = ? WHERE reservation_id = ?',
+      [status, reservationId]
+    );
+
+    return { success: true, message: `Rezervācijas statuss mainīts uz '${status}'.` };
+  },
 };
+
+// Mirror managed methods to spaceService
+spaceService.getManagedSpaces = reviewService.getManagedSpaces;
+spaceService.getManagedReservations = reviewService.getManagedReservations;
+spaceService.createSpace = reviewService.createSpace;
+spaceService.updateSpace = reviewService.updateSpace;
+spaceService.deleteSpace = reviewService.deleteSpace;
+spaceService.updateReservationStatus = reviewService.updateReservationStatus;
+};

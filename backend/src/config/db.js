@@ -80,8 +80,8 @@ function initSqliteTables() {
     CREATE TABLE IF NOT EXISTS users (
       user_id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT NOT NULL UNIQUE CHECK (length(username) >= 3 AND length(username) <= 20),
-      fname TEXT NOT NULL CHECK (length(fname) <= 50),
-      surname TEXT NOT NULL CHECK (length(surname) <= 50),
+      fname TEXT NOT NULL CHECK (length(fname) <= 50 AND fname NOT GLOB '*[0-9]*'),
+      surname TEXT NOT NULL CHECK (length(surname) <= 50 AND surname NOT GLOB '*[0-9]*'),
       email TEXT NOT NULL UNIQUE CHECK (length(email) <= 50 AND email LIKE '%@%.%'),
       phone_number TEXT NOT NULL UNIQUE CHECK (length(phone_number) >= 7 AND length(phone_number) <= 15),
       role_id INTEGER NOT NULL DEFAULT 2,
@@ -103,6 +103,7 @@ function initSqliteTables() {
       price_per_day REAL NOT NULL DEFAULT 0.00,
       is_instant_book INTEGER NOT NULL DEFAULT 0,
       is_active INTEGER NOT NULL DEFAULT 1,
+      amenities TEXT DEFAULT '[]',
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY (creator_id) REFERENCES users (user_id)
     );
@@ -151,6 +152,12 @@ function initSqliteTables() {
       FOREIGN KEY (space_id) REFERENCES coworking_spaces (space_id) ON DELETE CASCADE
     );
   `);
+
+  try {
+    sqliteDb.exec("ALTER TABLE coworking_spaces ADD COLUMN amenities TEXT DEFAULT '[]'");
+  } catch {
+    // Column already exists
+  }
 }
 
 

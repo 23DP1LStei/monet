@@ -18,22 +18,13 @@ test.before(async () => {
   process.env.DB_SQLITE_PATH = ':memory:';
   await initDatabase();
 
-  // Tikai testu atmiņas datubāze. Projekta MySQL/SQLite shēmu nemaina.
-  await query(`CREATE TABLE coworking_spaces (
-    space_id INTEGER PRIMARY KEY, creator_id INTEGER NOT NULL,
-    space_name TEXT NOT NULL, address TEXT NOT NULL, space_description TEXT,
-    available_spots INTEGER NOT NULL DEFAULT 1,
-    price_per_hour DECIMAL(10,2) NOT NULL, price_per_day DECIMAL(10,2) NOT NULL,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE, created_at TEXT NOT NULL
-  )`);
-  await query(`CREATE TABLE photos (
-    photo_id INTEGER PRIMARY KEY, space_id INTEGER NOT NULL, photo_path TEXT NOT NULL
-  )`);
-  await query(`CREATE TABLE reviews (
-    review_id INTEGER PRIMARY KEY, reservation_id INTEGER NOT NULL UNIQUE,
-    user_id INTEGER NOT NULL, space_id INTEGER NOT NULL, rating INTEGER NOT NULL,
-    comment TEXT, created_at TEXT NOT NULL
-  )`);
+  // Notīra iepriekšējos datus testa izpildei
+  await query('PRAGMA foreign_keys = OFF');
+  await query('DELETE FROM reviews');
+  await query('DELETE FROM photos');
+  await query('DELETE FROM payment_history');
+  await query('DELETE FROM reservations');
+  await query('DELETE FROM coworking_spaces');
 
   for (const row of [
     [1, 'Riga Workspace', 'Brīvības iela 10, Riga', 5.5, 29, true],

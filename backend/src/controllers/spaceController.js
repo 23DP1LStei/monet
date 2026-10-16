@@ -18,6 +18,7 @@ export async function listSpaces(req, res, next) {
       price_min,
       price_max,
       instant_book,
+      amenities,
       limit = '20',
       offset = '0',
     } = req.query;
@@ -71,6 +72,7 @@ export async function listSpaces(req, res, next) {
       price_min: priceMinNum,
       price_max: priceMaxNum,
       instant_book: instant_book === 'true' || instant_book === '1',
+      amenities: amenities || null,
       limit: limitNum,
       offset: offsetNum,
     });
@@ -79,6 +81,12 @@ export async function listSpaces(req, res, next) {
       success: true,
       count: spaces.length,
       data: spaces,
+      spaces,
+      pagination: {
+        limit: limitNum,
+        offset: offsetNum,
+        count: spaces.length,
+      },
     });
   } catch (err) {
     next(err);
