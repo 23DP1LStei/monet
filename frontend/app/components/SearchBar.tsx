@@ -125,10 +125,24 @@ export function SearchBar() {
                 <div className="p-4">
                   <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">Quick select</p>
                   <div className="grid grid-cols-3 gap-2 mb-4">
-                    {["Today", "Tomorrow", "This week"].map(l => (
-                      <button key={l} type="button" onClick={() => { setDate(l); close(); }}
-                        className={`text-left px-4 py-3 rounded-xl border text-sm font-medium transition-all ${date === l ? "border-blue-600 bg-blue-600 text-white" : "border-zinc-200 hover:border-zinc-300 text-zinc-700 hover:bg-zinc-50"}`}>
-                        {l}
+                    {[
+                      { label: "Today", value: new Date().toISOString().slice(0, 10) },
+                      {
+                        label: "Tomorrow",
+                        value: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
+                      },
+                      {
+                        label: "Next Monday",
+                        value: (() => {
+                          const d = new Date();
+                          d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7));
+                          return d.toISOString().slice(0, 10);
+                        })(),
+                      },
+                    ].map(item => (
+                      <button key={item.label} type="button" onClick={() => { setDate(item.value); close(); }}
+                        className={`text-left px-4 py-3 rounded-xl border text-sm font-medium transition-all ${date === item.value ? "border-blue-600 bg-blue-600 text-white" : "border-zinc-200 hover:border-zinc-300 text-zinc-700 hover:bg-zinc-50"}`}>
+                        {item.label}
                       </button>
                     ))}
                   </div>
