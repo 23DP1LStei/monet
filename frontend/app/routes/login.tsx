@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { Building2, AlertCircle, Loader2 } from "lucide-react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import axiosInstance, { saveSession } from '../axios';
 
 function showError(elementId: string, message: string) {
@@ -12,18 +12,21 @@ function showError(elementId: string, message: string) {
     }
 }
 
-export function isValidEmail(email: string): boolean {
-    const MAX_EMAIL_LENGTH = 50;
-    const isInvalidInput = !email || email.length === 0 || email.length > MAX_EMAIL_LENGTH;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (emailRegex.test(email) && !isInvalidInput) {
-        showError("emailError", "");
-        return true;
-    } else {
-        showError("emailError", "Enter a valid email address.");
+export function isValidIdentifier(identifier: string): boolean {
+    const trimmed = identifier.trim();
+    if (!trimmed || trimmed.length < 3 || trimmed.length > 50) {
+        showError("emailError", "Enter a valid email or username (at least 3 characters).");
         return false;
     }
+    if (trimmed.includes("@")) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(trimmed)) {
+            showError("emailError", "Enter a valid email address.");
+            return false;
+        }
+    }
+    showError("emailError", "");
+    return true;
 }
 
 export function isValidPassword(password: string): boolean {
@@ -42,6 +45,7 @@ export function isValidPassword(password: string): boolean {
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [globalError, setGlobalError] = useState<string | null>(null);
 
@@ -51,25 +55,26 @@ export default function LoginPage() {
 
         const form = e.currentTarget;
         const formData = new FormData(form);
-        const email = String(formData.get("email") || "").trim();
+        const identifier = String(formData.get("email") || "").trim();
         const password = String(formData.get("password") || "");
 
-        const validEmail = isValidEmail(email);
+        const validId = isValidIdentifier(identifier);
         const validPassword = isValidPassword(password);
-        if (!validEmail || !validPassword) return;
+        if (!validId || !validPassword) return;
 
         setLoading(true);
         try {
             // Поддержка входа как по email, так и по username
             const response = await axiosInstance.post("/auth/login", {
-                identifier: email,
+                identifier,
                 password,
             });
 
             // Наш бэкенд возвращает { success, token, user }
             const { token, user } = response.data;
             saveSession(token, user);
-            navigate("/");
+            const redirectPath = searchParams.get("redirect") || "/";
+            navigate(redirectPath);
         } catch (error: unknown) {
             const axiosErr = error as {
                 response?: {
@@ -117,12 +122,12 @@ export default function LoginPage() {
                     <label className="text-[12px] mb-1.25 text-[#3F3F46] font-semibold">Email or Username</label>
                     <input type="text" name="email" id="login-email" autoComplete="username"
                         className="bg-[#FAFAFA] outline outline-[#E4E4E7] rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition" />
-                    <p id="emailError" className="text-red-500 text-[12px] mt-1.25 min-h-4.5"></p>
+                    <p id="emailError" className="text-red-500 text-[12px] mt-1.25 min-h-[18px]"></p>
 
                     <label className="text-[12px] mt-3 mb-1.25 text-[#3F3F46] font-semibold">Password</label>
                     <input type="password" name="password" id="login-password" autoComplete="current-password"
                         className="bg-[#FAFAFA] outline outline-[#E4E4E7] rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition" />
-                    <p id="passwordError" className="text-red-500 text-[12px] mt-1.25 min-h-4.5"></p>
+                    <p id="passwordError" className="text-red-500 text-[12px] mt-1.25 min-h-[18px]"></p>
 
                     <button type="submit" disabled={loading}
                         className="flex items-center justify-center gap-2 bg-[#09090B] hover:bg-zinc-800 disabled:opacity-60 disabled:cursor-not-allowed transition-all text-white font-bold text-[13px] rounded-full h-[43.5px] mt-3.75 mb-6.25">
