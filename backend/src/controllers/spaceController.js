@@ -270,3 +270,122 @@ export async function createReview(req, res, next) {
     next(err);
   }
 }
+
+// ─── Managed Spaces & Dashboard (Host / Admin) ──────────────────────────────
+
+/**
+ * GET /api/spaces/managed
+ */
+export async function getManagedSpaces(req, res, next) {
+  try {
+    const userId = req.user.user_id;
+    const userRole = req.user.role_name;
+    const spaces = await spaceService.getManagedSpaces(userId, userRole);
+
+    const activeSpaces = spaces.filter(s => s.is_active === 1).length;
+    const pendingRequests = spaces.reduce((acc, s) => acc + (Number(s.pending_bookings) || 0), 0);
+    const totalSpots = spaces.reduce((acc, s) => acc + (Number(s.available_spots) || 0), 0);
+
+    return res.status(200).json({
+      success: true,
+      stats: {
+        total_spaces: spaces.length,
+        active_spaces: activeSpaces,
+        pending_requests: pendingRequests,
+        total_spots: totalSpots,
+      },
+      data: spaces,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * GET /api/spaces/managed/reservations
+ */
+export async function getManagedReservations(req, res, next) {
+  try {
+    const userId = req.user.user_id;
+    const userRole = req.user.role_name;
+    const reservations = await spaceService.getManagedReservations(userId, userRole);
+
+    return res.status(200).json({
+      success: true,
+      count: reservations.length,
+      data: reservations,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * POST /api/spaces/managed
+ */
+export async function createManagedSpace(req, res, next) {
+  try {
+    const userId = req.user.user_id;
+    const space = await spaceService.createSpace(req.body, userId);
+    return res.status(201).json({
+      success: true,
+      message: 'Telpa veiksmīgi izveidota.',
+      data: space,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * PUT /api/spaces/managed/:id
+ */
+export async function updateManagedSpace(req, res, next) {
+  try {
+    const spaceId = Number(req.params.id);
+    const userId = req.user.user_id;
+    const userRole = req.user.role_name;
+
+    const space = await spaceService.updateSpace(spaceId, req.body, userId, userRole);
+    return res.status(200).json({
+      success: true,
+      message: 'Telpa veiksmīgi atjaunināta.',
+      data: space,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * DELETE /api/spaces/managed/:id
+ */
+export async function deleteManagedSpace(req, res, next) {
+  try {
+    const spaceId = Number(req.params.id);
+    const userId = req.user.user_id;
+    const userRole = req.user.role_name;
+
+    const result = await spaceService.deleteSpace(spaceId, userId, userRole);
+    return res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * PATCH /api/spaces/managed/reservations/:id
+ */
+export async function updateManagedReservation(req, res, next) {
+  try {
+    const reservationId = Number(req.params.id);
+    const { status } = req.body;
+    const userId = req.user.user_id;
+    const userRole = req.user.role_name;
+
+    const result = await spaceService.updateReservationStatus(reservationId, status, userId, userRole);
+    return res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+}

@@ -7,12 +7,36 @@ import {
   getMyReservations,
   cancelReservation,
   createReview,
+  getManagedSpaces,
+  getManagedReservations,
+  createManagedSpace,
+  updateManagedSpace,
+  deleteManagedSpace,
+  updateManagedReservation,
 } from '../controllers/spaceController.js';
 import { authenticateToken, authorizeRoles } from '../middleware/auth.js';
 
 const router = Router();
 
-// ─── Telpu publiskie galapunkti ────────────────────────────────────────────────
+// ─── Telpu publiskie un pārvaldības galapunkti ─────────────────────────────────
+
+// GET /api/spaces/managed — pārvaldīto telpu saraksts (landlord/admin)
+router.get('/managed', authenticateToken, getManagedSpaces);
+
+// GET /api/spaces/managed/reservations — ienākošās rezervācijas (landlord/admin)
+router.get('/managed/reservations', authenticateToken, getManagedReservations);
+
+// POST /api/spaces/managed — jauna telpa (user/landlord/admin)
+router.post('/managed', authenticateToken, authorizeRoles('user', 'landlord', 'admin'), createManagedSpace);
+
+// PUT /api/spaces/managed/:id — rediģēt telpu
+router.put('/managed/:id', authenticateToken, authorizeRoles('user', 'landlord', 'admin'), updateManagedSpace);
+
+// DELETE /api/spaces/managed/:id — dzēst telpu
+router.delete('/managed/:id', authenticateToken, authorizeRoles('user', 'landlord', 'admin'), deleteManagedSpace);
+
+// PATCH /api/spaces/managed/reservations/:id — atjaunināt rezervācijas statusu
+router.patch('/managed/reservations/:id', authenticateToken, authorizeRoles('user', 'landlord', 'admin'), updateManagedReservation);
 
 // GET /api/spaces — telpu saraksts ar filtriem (city, type, price_min, price_max, instant_book, ...)
 router.get('/', listSpaces);

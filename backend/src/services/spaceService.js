@@ -497,7 +497,7 @@ export const reservationService = {
       [reservationId]
     );
 
-    // 5.4 / 5.5: Atjauno rezervācijas un maksājuma statusu uz refunded
+    // Atjauno maksājuma statusu uz refunded
     await query(
       `UPDATE payment_history SET payment_status = 'refunded' WHERE reservation_id = ?`,
       [reservationId]
@@ -799,4 +799,4 @@ spaceService.createSpace = reviewService.createSpace;
 spaceService.updateSpace = reviewService.updateSpace;
 spaceService.deleteSpace = reviewService.deleteSpace;
 spaceService.updateReservationStatus = reviewService.updateReservationStatus;
-};
+
