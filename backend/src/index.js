@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
 import roleRoutes from './routes/roleRoutes.js';
 import spaceRoutes from './routes/spaceRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import { initDatabase, getDriverName } from './config/db.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
@@ -69,6 +70,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/spaces', spaceRoutes);
+app.use('/api/admin', adminRoutes);
 
 // ─── Kļūdu apstrāde ───────────────────────────────────────────────────────────
 app.use(notFoundHandler);
