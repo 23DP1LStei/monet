@@ -8,5 +8,6 @@ export default [
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
   route("mybookings", "routes/mybookings.tsx"),
+  route("admindashboard", "routes/admindashboard.tsx"),
 ] satisfies RouteConfig;
-// last updated: Oct 10 2026
+// last updated: Oct 19 2026

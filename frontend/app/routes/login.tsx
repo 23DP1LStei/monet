@@ -117,12 +117,12 @@ export default function LoginPage() {
                     <label className="text-[12px] mb-1.25 text-[#3F3F46] font-semibold">Email or Username</label>
                     <input type="text" name="email" id="login-email" autoComplete="username"
                         className="bg-[#FAFAFA] outline outline-[#E4E4E7] rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition" />
-                    <p id="emailError" className="text-red-500 text-[12px] mt-1.25 min-h-[18px]"></p>
+                    <p id="emailError" className="text-red-500 text-[12px] mt-1.25 min-h-4.5"></p>
 
                     <label className="text-[12px] mt-3 mb-1.25 text-[#3F3F46] font-semibold">Password</label>
                     <input type="password" name="password" id="login-password" autoComplete="current-password"
                         className="bg-[#FAFAFA] outline outline-[#E4E4E7] rounded-2xl pt-2.5 pb-2.5 pl-3.5 pr-3.5 focus:bg-white focus:outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/5 transition" />
-                    <p id="passwordError" className="text-red-500 text-[12px] mt-1.25 min-h-[18px]"></p>
+                    <p id="passwordError" className="text-red-500 text-[12px] mt-1.25 min-h-4.5"></p>
 
                     <button type="submit" disabled={loading}
                         className="flex items-center justify-center gap-2 bg-[#09090B] hover:bg-zinc-800 disabled:opacity-60 disabled:cursor-not-allowed transition-all text-white font-bold text-[13px] rounded-full h-[43.5px] mt-3.75 mb-6.25">

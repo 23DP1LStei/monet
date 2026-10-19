@@ -20,7 +20,7 @@ export function Navbar() {
 
           <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
             <Link to="/search"   className="rounded-full px-3.5 py-2 text-zinc-600 hover:bg-zinc-100 transition-colors">Explore</Link>
-            <Link to="/bookings" className="rounded-full px-3.5 py-2 text-zinc-600 hover:bg-zinc-100 transition-colors">My Bookings</Link>
+            <Link to="/mybookings" className="rounded-full px-3.5 py-2 text-zinc-600 hover:bg-zinc-100 transition-colors">My Bookings</Link>
             <Link to="/admin"    className="rounded-full px-3.5 py-2 text-zinc-600 hover:bg-zinc-100 transition-colors">For Hosts</Link>
           </nav>
 
