@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS roles (
   role_name VARCHAR(20) NOT NULL UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5.2. Tabula: users (Reģistrētie lietotāji)
+-- 5.2. Tabula: users (Registrētie lietotāji)
 CREATE TABLE IF NOT EXISTS users (
   user_id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(20) NOT NULL UNIQUE,
@@ -34,17 +34,20 @@ CREATE TABLE IF NOT EXISTS coworking_spaces (
   space_id INT AUTO_INCREMENT PRIMARY KEY,
   creator_id INT NOT NULL,
   space_name VARCHAR(100) NOT NULL,
+  city VARCHAR(100) NOT NULL DEFAULT '',
   address VARCHAR(255) NOT NULL,
+  space_type ENUM('hot-desk', 'dedicated', 'private-office', 'meeting-room') NOT NULL DEFAULT 'hot-desk',
   space_description TEXT,
   available_spots INT NOT NULL DEFAULT 1,
   price_per_hour DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   price_per_day DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  is_instant_book BOOLEAN NOT NULL DEFAULT FALSE,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_spaces_creator FOREIGN KEY (creator_id) REFERENCES users (user_id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5.7. Tabula: photos (Telpu fotoattēli)
+-- 5.7. Tabula: photos (Telpu fotoatteli)
 CREATE TABLE IF NOT EXISTS photos (
   photo_id INT AUTO_INCREMENT PRIMARY KEY,
   space_id INT NOT NULL,
@@ -52,7 +55,7 @@ CREATE TABLE IF NOT EXISTS photos (
   CONSTRAINT fk_photos_space FOREIGN KEY (space_id) REFERENCES coworking_spaces (space_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5.4. Tabula: reservations (Telpu rezervācijas)
+-- 5.4. Tabula: reservations (Telpu rezervacijas)
 CREATE TABLE IF NOT EXISTS reservations (
   reservation_id INT AUTO_INCREMENT PRIMARY KEY,
   space_id INT NOT NULL,
@@ -68,7 +71,7 @@ CREATE TABLE IF NOT EXISTS reservations (
   CONSTRAINT fk_reservations_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5.5. Tabula: payment_history (Maksājumu vēsture)
+-- 5.5. Tabula: payment_history (Maksajumu vesture)
 CREATE TABLE IF NOT EXISTS payment_history (
   payment_id INT AUTO_INCREMENT PRIMARY KEY,
   reservation_id INT NOT NULL,
@@ -78,7 +81,7 @@ CREATE TABLE IF NOT EXISTS payment_history (
   CONSTRAINT fk_payments_reservation FOREIGN KEY (reservation_id) REFERENCES reservations (reservation_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5.6. Tabula: reviews (Atsauksmes un vērtējumi)
+-- 5.6. Tabula: reviews (Atsauksmes un vertejumi)
 CREATE TABLE IF NOT EXISTS reviews (
   review_id INT AUTO_INCREMENT PRIMARY KEY,
   reservation_id INT NOT NULL UNIQUE,
@@ -92,9 +95,15 @@ CREATE TABLE IF NOT EXISTS reviews (
   CONSTRAINT fk_reviews_space FOREIGN KEY (space_id) REFERENCES coworking_spaces (space_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Sākotnējie sistēmas dati: Lomas
+-- Sakotnejo sistemas dati: Lomas
 INSERT IGNORE INTO roles (role_id, role_name) VALUES
   (1, 'guest'),
   (2, 'user'),
   (3, 'landlord'),
   (4, 'admin');
+
+-- Migracijas: droši pievieno jaunos laukus iespejamai esosai DB
+ALTER TABLE coworking_spaces
+  ADD COLUMN IF NOT EXISTS city VARCHAR(100) NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS space_type ENUM('hot-desk','dedicated','private-office','meeting-room') NOT NULL DEFAULT 'hot-desk',
+  ADD COLUMN IF NOT EXISTS is_instant_book BOOLEAN NOT NULL DEFAULT FALSE;

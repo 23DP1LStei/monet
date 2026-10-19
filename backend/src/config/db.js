@@ -84,13 +84,82 @@ function initSqliteTables() {
       surname TEXT NOT NULL CHECK (length(surname) <= 50 AND surname NOT GLOB '*[0-9]*'),
       email TEXT NOT NULL UNIQUE CHECK (length(email) <= 50 AND email LIKE '%@%.%'),
       phone_number TEXT NOT NULL UNIQUE CHECK (length(phone_number) >= 7 AND length(phone_number) <= 15),
-      role_id INTEGER NOT NULL,
+      role_id INTEGER NOT NULL DEFAULT 2,
       password_hash TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY (role_id) REFERENCES roles (role_id)
     );
+
+    CREATE TABLE IF NOT EXISTS coworking_spaces (
+      space_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      creator_id INTEGER NOT NULL,
+      space_name TEXT NOT NULL,
+      city TEXT NOT NULL DEFAULT '',
+      address TEXT NOT NULL,
+      space_type TEXT NOT NULL DEFAULT 'hot-desk' CHECK (space_type IN ('hot-desk','dedicated','private-office','meeting-room')),
+      space_description TEXT,
+      available_spots INTEGER NOT NULL DEFAULT 1,
+      price_per_hour REAL NOT NULL DEFAULT 0.00,
+      price_per_day REAL NOT NULL DEFAULT 0.00,
+      is_instant_book INTEGER NOT NULL DEFAULT 0,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      amenities TEXT DEFAULT '[]',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (creator_id) REFERENCES users (user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS photos (
+      photo_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      space_id INTEGER NOT NULL,
+      photo_path TEXT NOT NULL,
+      FOREIGN KEY (space_id) REFERENCES coworking_spaces (space_id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS reservations (
+      reservation_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      space_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      reservation_type TEXT NOT NULL DEFAULT 'individual' CHECK (reservation_type IN ('individual','group')),
+      guest_count INTEGER NOT NULL DEFAULT 1,
+      amount REAL NOT NULL,
+      start_time TEXT NOT NULL,
+      end_time TEXT NOT NULL,
+      reservation_status TEXT NOT NULL DEFAULT 'pending' CHECK (reservation_status IN ('pending','confirmed','canceled')),
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (space_id) REFERENCES coworking_spaces (space_id),
+      FOREIGN KEY (user_id) REFERENCES users (user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS payment_history (
+      payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      reservation_id INTEGER NOT NULL,
+      amount REAL NOT NULL,
+      payment_status TEXT NOT NULL DEFAULT 'successful' CHECK (payment_status IN ('successful','failed','refunded')),
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (reservation_id) REFERENCES reservations (reservation_id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS reviews (
+      review_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      reservation_id INTEGER NOT NULL UNIQUE,
+      user_id INTEGER NOT NULL,
+      space_id INTEGER NOT NULL,
+      rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+      comment TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (reservation_id) REFERENCES reservations (reservation_id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users (user_id),
+      FOREIGN KEY (space_id) REFERENCES coworking_spaces (space_id) ON DELETE CASCADE
+    );
   `);
+
+  try {
+    sqliteDb.exec("ALTER TABLE coworking_spaces ADD COLUMN amenities TEXT DEFAULT '[]'");
+  } catch {
+    // Column already exists
+  }
 }
+
 
 /**
  * Aizpilda sākotnējās lietotāju lomas (guest, user, landlord, admin)

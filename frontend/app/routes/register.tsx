@@ -1,8 +1,8 @@
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { Building2 } from "lucide-react";
-import { Link } from "react-router";
-import axiosInstance from '../axios';
+import { Link, useNavigate } from "react-router";
+import axiosInstance, { saveSession } from '../axios';
 
 function showError(elementId: string, message: string) {
     const element = document.getElementById(elementId);
@@ -119,52 +119,55 @@ export function isValidPhoneNumber(phone_number: string): boolean {
     }
 }
 
-const register = async (payload: any) => {
-    try { 
-        
+const register = async (payload: Record<string, string>, navigate: (path: string) => void) => {
+    try {
         const response = await axiosInstance.post("/auth/register", payload);
-        console.log(response.data);
         if (response.status === 201) {
-            // Store token in localStorage
-            localStorage.setItem('auth_token', response.data.api_token);
-            localStorage.setItem('csrf_token', response.data.csrf_token);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            
-            // Update axios default header with token
-            axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.api_token}`;
-            axiosInstance.defaults.headers.common['X-CSRF-TOKEN'] = response.data.csrf_token;
-            
-            window.location.href = "/";
+            // Mūsu bēkends atgriež { success, token, user }
+            saveSession(response.data.token, response.data.user);
+            navigate("/");
         }
-    } catch (error) {
-        console.error(error);
+    } catch (error: unknown) {
+        const axiosErr = error as {
+            response?: { data?: { message?: string; errors?: { field: string; message: string }[] } };
+        };
+        const apiErrors = axiosErr.response?.data?.errors;
+        const apiMsg = axiosErr.response?.data?.message;
+
+        if (apiErrors && apiErrors.length > 0) {
+            apiErrors.forEach((e) => showError(`${e.field}Error`, e.message));
+        } else if (apiMsg) {
+            // Parāda vispārīgu kļūdu pirmajā pieejamajā laukā
+            showError('fnameError', apiMsg);
+        }
     }
 };
 
 export default function RegisterPage() {
-    function handleSubmit(e: any) {
-        // Prevent the browser from reloading the page
-        e.preventDefault();
-    
-        // Read the form data
-        const form = e.target;
-        const formData = new FormData(form);
-        const fname = formData.get("fname");
-        const surname = formData.get("surname");
-        const username = formData.get("username");
-        const email = formData.get("email");
-        const phone_number = formData.get("phone_number");
-        const password = formData.get("password");
+    const navigate = useNavigate();
 
-        let validfname = isValidFisrtName(String(fname));
-        let validsurname = isValidSurname(String(surname));
-        let validusername = isValidUsername(String(username));
-        let validEmail = isValidEmail(String(email));
-        let validPhoneNumber = isValidPhoneNumber(String(phone_number));
-        let validPassword = isValidPassword(String(password));
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const fname = String(formData.get("fname") || "").trim();
+        const surname = String(formData.get("surname") || "").trim();
+        const username = String(formData.get("username") || "").trim();
+        const email = String(formData.get("email") || "").trim();
+        const phone_number = String(formData.get("phone_number") || "").trim();
+        const password = String(formData.get("password") || "");
+
+        const validfname = isValidFisrtName(fname);
+        const validsurname = isValidSurname(surname);
+        const validusername = isValidUsername(username);
+        const validEmail = isValidEmail(email);
+        const validPhoneNumber = isValidPhoneNumber(phone_number);
+        const validPassword = isValidPassword(password);
 
         if (validfname && validsurname && validusername && validEmail && validPhoneNumber && validPassword) {
-            register(formData);
+            // Sūta JSON, nevis FormData
+            register({ fname, surname, username, email, phone_number, password }, navigate);
         }
     }
 return (
