@@ -50,7 +50,7 @@ router.get('/:id/reviews', getSpaceReviews);
 // ─── Rezervāciju galapunkti (prasa autentifikāciju) ───────────────────────────
 
 // POST /api/reservations — jauna rezervācija (body: space_id, reservation_type, guest_count, start_time, end_time)
-router.post('/reservations', authenticateToken, authorizeRoles('user', 'landlord', 'admin'), createReservation);
+router.post('/reservations', authenticateToken, authorizeRoles('guest', 'user', 'landlord', 'admin'), createReservation);
 
 // GET /api/reservations/my — autorizētā lietotāja rezervācijas (query: status, limit, offset)
 router.get('/reservations/my', authenticateToken, getMyReservations);
@@ -62,6 +62,6 @@ router.patch('/reservations/:id/cancel', authenticateToken, cancelReservation);
 
 // POST /api/reviews — jauna atsauksme pēc pabeigtas rezervācijas
 // Body: { reservation_id, rating (1-5), comment? }
-router.post('/reviews', authenticateToken, authorizeRoles('user', 'landlord', 'admin'), createReview);
+router.post('/reviews', authenticateToken, authorizeRoles('guest', 'user', 'landlord', 'admin'), createReview);
 
 export default router;

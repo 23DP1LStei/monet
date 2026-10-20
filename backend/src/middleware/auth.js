@@ -42,7 +42,13 @@ export function authorizeRoles(...allowedRoles) {
       });
     }
 
-    const userRole = (req.user.role_name || '').toLowerCase();
+    // Lomu noteikšana ar rezerves variantiem (role_name, role vai role_id)
+    let resolvedRole = req.user.role_name || req.user.role;
+    if (!resolvedRole && req.user.role_id) {
+      const roleMap = { 1: 'guest', 2: 'user', 3: 'landlord', 4: 'admin' };
+      resolvedRole = roleMap[req.user.role_id];
+    }
+    const userRole = (resolvedRole || '').toLowerCase();
     const hasRole = allowedRoles.map((r) => r.toLowerCase()).includes(userRole);
 
     if (!hasRole) {
