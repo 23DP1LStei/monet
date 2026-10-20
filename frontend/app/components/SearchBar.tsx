@@ -94,7 +94,7 @@ export function SearchBar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 4, scale: 0.98 }}
               transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute top-[calc(100%+10px)] left-0 right-0 z-50 bg-white rounded-3xl shadow-[0_16px_60px_rgba(0,0,0,0.18)] border border-zinc-200/60 overflow-hidden">
+              className="relative top-[calc(100%+10px)] left-0 right-0 z-50 bg-white rounded-3xl shadow-[0_16px_60px_rgba(0,0,0,0.18)] border border-zinc-200/60 overflow-hidden">
 
               {active === "location" && (
                 <div className="p-4">
