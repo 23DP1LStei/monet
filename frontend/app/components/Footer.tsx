@@ -11,7 +11,7 @@ const LINKS = {
   Account: [
     { label: "Sign In",        href: "/login" },
     { label: "Create Account", href: "/register" },
-    { label: "My Bookings",    href: "/bookings" },
+    { label: "My Bookings",    href: "/mybookings" },
     { label: "For Hosts",      href: "/admin" },
   ],
 };
