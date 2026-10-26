@@ -1,5 +1,7 @@
 # Monet Kopstrādes Sistēma — Aizmugursistēmas (Backend) API
 
+> 📄 **Lietotāja rokasgrāmata (PDF):** [Lejupielādēt sistēmas lietotāja instrukciju (PDF)](monet_instrukcija.pdf)
+
 Sākumlapas telpu API: skatīt [MAIN_PAGE_API.md](MAIN_PAGE_API.md) — aktīvās telpas,
 lokācijas meklēšana, cenas, foto un vērtējumi, kā arī vēl saskaņojamās iespējas.
 
