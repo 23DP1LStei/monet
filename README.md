@@ -137,14 +137,7 @@ Rezultāti ir aprakstīti XML/HTML atskaitē (`coverage/` direktorijā).
 
 ---
 
-## 9. Palīdzība un saziņa
-- **Live čats** – pieejams UI (labākākai iekļaušanai var pievienot UI plugin).
-- **E‑pasts** – support@monet.example.com
-- **Dokumentācija** – https://docs.monet.example.com (tiek turpināta izveide).
-
----
-
-## 10. Drošība un privātums
+## 9. Drošība un privātums
 - **JWT** – īsa dzīves laika, SSL/TLS pieslēgumi.
 - **Paroles** – glabātas ar `bcryptjs` (`saltRounds = 10`).
 - **CORS** – konfigurēts `backend/src/middleware/validate.js` lai atļautu tikai mūsu domēnu.
@@ -152,7 +145,7 @@ Rezultāti ir aprakstīti XML/HTML atskaitē (`coverage/` direktorijā).
 
 ---
 
-## 11. Licences noteikumi
+## 10. Licences noteikumi
 Šis projekts tiek licencēts zem **MIT licences**. Plašāka informācija atrodama failā `LICENSE`.
 
 ---
