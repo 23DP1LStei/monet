@@ -1,5 +1,7 @@
 # Monet – kopstrādes telpu platforma
 
+> 📄 **Lietotāja rokasgrāmata (PDF):** [Lejupielādēt sistēmas lietotāja instrukciju (PDF)](monet_instrukcija.pdf)
+
 > **Īss apraksts** – Monet ir tiešsaistes platforma, kas ļauj lietotājiem reģistrēties, rezervēt telpas, pārvaldīt rezervācijas un administrēt sistēmu. Projekts ir sadalīts divās daļās – **backend** (Node.js/Express) un **frontend** (React + Vite).
 
 ---
