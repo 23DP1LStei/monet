@@ -151,8 +151,8 @@ export const authService = {
    * @param {Object} credentials Lietotāja akreditācijas dati
    */
   async login(credentials) {
-    const { email, identifier, password } = credentials;
-    const loginId = (email || identifier || '').trim().toLowerCase();
+    const { email, identifier, username, password } = credentials;
+    const loginId = (email || identifier || username || '').trim().toLowerCase();
 
     // Meklē lietotāju pēc e-pasta vai lietotājvārda
     const { rows } = await query(
@@ -218,5 +218,109 @@ export const authService = {
       'SELECT role_id, role_name FROM roles ORDER BY role_id ASC'
     );
     return rows;
+  },
+
+  /**
+   * Atjaunina lietotāja profilu (vārds, uzvārds, lietotājvārds, e-pasts, tālrunis)
+   */
+  async updateProfile(userId, data) {
+    const { rows: currentUsers } = await query(
+      `SELECT u.user_id, u.username, u.fname, u.surname, u.email, u.phone_number, u.role_id, r.role_name, u.created_at
+       FROM users u
+       JOIN roles r ON u.role_id = r.role_id
+       WHERE u.user_id = ?`,
+      [userId]
+    );
+
+    if (!currentUsers || currentUsers.length === 0) {
+      throw new AuthenticationError('Lietotājs nav atrasts.');
+    }
+
+    const current = currentUsers[0];
+
+    const username = (data.username !== undefined ? data.username.trim() : current.username);
+    const fname = (data.fname !== undefined ? data.fname.trim() : current.fname);
+    const surname = (data.surname !== undefined ? data.surname.trim() : current.surname);
+    const email = (data.email !== undefined ? data.email.trim().toLowerCase() : current.email);
+    const phone_number = (data.phone_number !== undefined ? data.phone_number.trim() : current.phone_number);
+
+    // Pārbauda unikalitāti starp citiem lietotājiem
+    const { rows: conflictUsers } = await query(
+      `SELECT user_id, username, email, phone_number
+       FROM users
+       WHERE (LOWER(username) = ? OR LOWER(email) = ? OR phone_number = ?) AND user_id != ?`,
+      [username.toLowerCase(), email.toLowerCase(), phone_number, userId]
+    );
+
+    if (conflictUsers && conflictUsers.length > 0) {
+      for (const u of conflictUsers) {
+        if (u.username.toLowerCase() === username.toLowerCase()) {
+          throw new ConflictError('Lietotājvārds jau ir aizņemts.', 'username');
+        }
+        if (u.email.toLowerCase() === email.toLowerCase()) {
+          throw new ConflictError('E-pasta adrese jau ir reģistrēta.', 'email');
+        }
+        if (u.phone_number === phone_number) {
+          throw new ConflictError('Tālruņa numurs jau ir reģistrēts.', 'phone_number');
+        }
+      }
+    }
+
+    await query(
+      `UPDATE users
+       SET username = ?, fname = ?, surname = ?, email = ?, phone_number = ?
+       WHERE user_id = ?`,
+      [username, fname, surname, email, phone_number, userId]
+    );
+
+    const { rows: updatedRows } = await query(
+      `SELECT u.user_id, u.username, u.fname, u.surname, u.email, u.phone_number, u.role_id, r.role_name, u.created_at
+       FROM users u
+       JOIN roles r ON u.role_id = r.role_id
+       WHERE u.user_id = ?`,
+      [userId]
+    );
+
+    const updatedUser = updatedRows[0];
+    const token = generateToken({
+      user_id: updatedUser.user_id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      role_id: updatedUser.role_id,
+      role_name: updatedUser.role_name,
+    });
+
+    return { user: updatedUser, token };
+  },
+
+  /**
+   * Maina lietotāja paroli ar pašreizējās paroles pārbaudi
+   */
+  async changePassword(userId, { current_password, new_password }) {
+    const { rows } = await query(
+      'SELECT user_id, password_hash FROM users WHERE user_id = ?',
+      [userId]
+    );
+
+    if (!rows || rows.length === 0) {
+      throw new AuthenticationError('Lietotājs nav atrasts.');
+    }
+
+    const user = rows[0];
+
+    const isMatch = await bcrypt.compare(current_password, user.password_hash);
+    if (!isMatch) {
+      throw new AuthenticationError('Pašreizējā parole ir nepareiza.');
+    }
+
+    const saltRounds = 10;
+    const newHash = await bcrypt.hash(new_password, saltRounds);
+
+    await query(
+      'UPDATE users SET password_hash = ? WHERE user_id = ?',
+      [newHash, userId]
+    );
+
+    return { success: true, message: 'Parole veiksmīgi atjaunināta.' };
   },
 };

@@ -110,8 +110,8 @@ export function validateRegister(req, res, next) {
  * Autorizācijas (pieteikšanās) ievades datu validācija
  */
 export function validateLogin(req, res, next) {
-  const { email, identifier, password } = req.body;
-  const loginId = email || identifier;
+  const { email, identifier, username, password } = req.body;
+  const loginId = email || identifier || username;
   const errors = [];
 
   if (!loginId || typeof loginId !== 'string' || !loginId.trim()) {
@@ -124,6 +124,121 @@ export function validateLogin(req, res, next) {
     errors.push({ field: 'password', message: 'Parole ir obligāts lauks.' });
   } else if (password.length > 50) {
     errors.push({ field: 'password', message: 'Parole nedrīkst pārsniegt 50 simbolus.' });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'Nederīgi ievadīti dati.',
+      errors,
+    });
+  }
+
+  next();
+}
+
+/**
+ * Profila atjaunināšanas validācija
+ */
+export function validateUpdateProfile(req, res, next) {
+  const { username, fname, surname, email, phone_number } = req.body;
+  const errors = [];
+
+  if (username !== undefined) {
+    if (typeof username !== 'string' || !username.trim()) {
+      errors.push({ field: 'username', message: 'Lietotājvārds nedrīkst būt tukšs.' });
+    } else {
+      const trimmed = username.trim();
+      if (trimmed.length < 3 || trimmed.length > 20) {
+        errors.push({ field: 'username', message: 'Lietotājvārda garumam jābūt no 3 līdz 20 simboliem.' });
+      } else if (!usernameRegex.test(trimmed)) {
+        errors.push({ field: 'username', message: 'Lietotājvārdā atļauti tikai burti, cipari un simboli "_", "-", "." (3-20 simboli).' });
+      }
+    }
+  }
+
+  if (fname !== undefined) {
+    if (typeof fname !== 'string' || !fname.trim()) {
+      errors.push({ field: 'fname', message: 'Vārds nedrīkst būt tukšs.' });
+    } else {
+      const trimmed = fname.trim();
+      if (trimmed.length > 50) {
+        errors.push({ field: 'fname', message: 'Vārds nedrīkst pārsniegt 50 simbolus.' });
+      } else if (!fnameRegex.test(trimmed)) {
+        errors.push({ field: 'fname', message: 'Vārds nedrīkst saturēt ciparus.' });
+      }
+    }
+  }
+
+  if (surname !== undefined) {
+    if (typeof surname !== 'string' || !surname.trim()) {
+      errors.push({ field: 'surname', message: 'Uzvārds nedrīkst būt tukšs.' });
+    } else {
+      const trimmed = surname.trim();
+      if (trimmed.length > 50) {
+        errors.push({ field: 'surname', message: 'Uzvārds nedrīkst pārsniegt 50 simbolus.' });
+      } else if (!lnameRegex.test(trimmed)) {
+        errors.push({ field: 'surname', message: 'Uzvārds nedrīkst saturēt ciparus.' });
+      }
+    }
+  }
+
+  if (email !== undefined) {
+    if (typeof email !== 'string' || !email.trim()) {
+      errors.push({ field: 'email', message: 'E-pasts nedrīkst būt tukšs.' });
+    } else {
+      const trimmed = email.trim();
+      if (trimmed.length > 50) {
+        errors.push({ field: 'email', message: 'E-pasts nedrīkst pārsniegt 50 simbolus.' });
+      } else if (!emailRegex.test(trimmed)) {
+        errors.push({ field: 'email', message: 'Nederīgs e-pasta adreses formāts.' });
+      }
+    }
+  }
+
+  if (phone_number !== undefined) {
+    if (typeof phone_number !== 'string' || !phone_number.trim()) {
+      errors.push({ field: 'phone_number', message: 'Tālruņa numurs nedrīkst būt tukšs.' });
+    } else {
+      const cleaned = phone_number.trim();
+      if (cleaned.length < 7 || cleaned.length > 15) {
+        errors.push({ field: 'phone_number', message: 'Tālruņa numura garumam jābūt no 7 līdz 15 simboliem.' });
+      } else if (!phoneNumberRegex.test(cleaned)) {
+        errors.push({ field: 'phone_number', message: 'Nederīgs tālruņa numura formāts (7-15 cipari).' });
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'Nederīgi ievadīti dati.',
+      errors,
+    });
+  }
+
+  next();
+}
+
+/**
+ * Paroles maiņas validācija
+ */
+export function validateChangePassword(req, res, next) {
+  const { current_password, new_password } = req.body;
+  const errors = [];
+
+  if (!current_password || typeof current_password !== 'string') {
+    errors.push({ field: 'current_password', message: 'Pašreizējā parole ir obligāts lauks.' });
+  }
+
+  if (!new_password || typeof new_password !== 'string') {
+    errors.push({ field: 'new_password', message: 'Jaunā parole ir obligāts lauks.' });
+  } else {
+    if (new_password.length < 8 || new_password.length > 50) {
+      errors.push({ field: 'new_password', message: 'Jaunās paroles garumam jābūt no 8 līdz 50 simboliem.' });
+    } else if (!passwordRegex.test(new_password)) {
+      errors.push({ field: 'new_password', message: 'Jaunajai parolei jāsatur gan burti, gan vismaz viens cipars (8-50 simboli).' });
+    }
   }
 
   if (errors.length > 0) {

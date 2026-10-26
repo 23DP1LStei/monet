@@ -16,12 +16,15 @@ export const authController = {
   async register(req, res, next) {
     try {
       const { user, token } = await authService.register(req.body);
-      res.cookie(AUTH_COOKIE, token, authCookieOptions);
+      if (typeof res.cookie === 'function') {
+        res.cookie(AUTH_COOKIE, token, authCookieOptions);
+      }
 
       return res.status(201).json({
         success: true,
         message: 'Lietotājs veiksmīgi reģistrēts.',
         user,
+        token,
       });
     } catch (err) {
       if (err instanceof ConflictError) {
@@ -42,12 +45,15 @@ export const authController = {
   async login(req, res, next) {
     try {
       const { user, token } = await authService.login(req.body);
-      res.cookie(AUTH_COOKIE, token, authCookieOptions);
+      if (typeof res.cookie === 'function') {
+        res.cookie(AUTH_COOKIE, token, authCookieOptions);
+      }
 
       return res.status(200).json({
         success: true,
         message: 'Veiksmīga autorizācija.',
         user,
+        token,
       });
     } catch (err) {
       if (err instanceof AuthenticationError) {
@@ -89,7 +95,9 @@ export const authController = {
    * Izraksta lietotāju no sistēmas
    */
   async logout(req, res) {
-    res.clearCookie(AUTH_COOKIE, authCookieOptions);
+    if (typeof res.clearCookie === 'function') {
+      res.clearCookie(AUTH_COOKIE, authCookieOptions);
+    }
     return res.status(200).json({
       success: true,
       message: 'Veiksmīgi izrakstījies no sistēmas.',
@@ -108,6 +116,56 @@ export const authController = {
         roles,
       });
     } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/auth/profile
+   * Atjaunina lietotāja profilu
+   */
+  async updateProfile(req, res, next) {
+    try {
+      const { user, token } = await authService.updateProfile(req.user.user_id, req.body);
+      return res.status(200).json({
+        success: true,
+        message: 'Profils veiksmīgi atjaunināts.',
+        user,
+        token,
+      });
+    } catch (err) {
+      if (err instanceof ConflictError) {
+        return res.status(409).json({
+          success: false,
+          message: err.message,
+          field: err.field,
+        });
+      }
+      if (err instanceof AuthenticationError) {
+        return res.status(401).json({
+          success: false,
+          message: err.message,
+        });
+      }
+      next(err);
+    }
+  },
+
+  /**
+   * PUT /api/auth/password
+   * Maina lietotāja paroli
+   */
+  async changePassword(req, res, next) {
+    try {
+      const result = await authService.changePassword(req.user.user_id, req.body);
+      return res.status(200).json(result);
+    } catch (err) {
+      if (err instanceof AuthenticationError) {
+        return res.status(400).json({
+          success: false,
+          message: err.message,
+        });
+      }
       next(err);
     }
   },
